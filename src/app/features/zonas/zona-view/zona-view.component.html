@@ -1,0 +1,773 @@
+<main class="zona-main container">
+  <!-- 🔵 Card principal con nombre y detalles de zona -->
+  <div class="card shadow-sm border-dark my-4 zona-card">
+    <div class="card-body text-center">
+      <h1 class="fw-bold mb-4">{{ zona.nombre }}</h1>
+      <p class="zona-detalle">{{ zona.estacion }}</p>
+      <p class="zona-detalle"><strong>📌</strong> {{ zona.coordenadas }}</p>
+    </div>
+  </div>
+
+  <div class="mb-3" *ngIf="temporadas.length > 0">
+    <label class="form-label">Filtrar por temporada</label>
+    <select
+      class="form-select"
+      [(ngModel)]="temporadaSeleccionadaId"
+      (change)="actualizarGraficoGradosDia()"
+    >
+      <option [ngValue]="null">Todas las temporadas</option>
+      <option *ngFor="let temp of temporadas" [ngValue]="temp.id">
+        {{ temp.nombre }}
+      </option>
+    </select>
+  </div>
+
+  <!-- 💧 Sección: Consumo de Agua -->
+  <div class="card shadow-sm border-dark mb-4">
+    <div
+      class="card-header d-flex justify-content-between align-items-center bg-primary text-white"
+      style="cursor: pointer"
+      (click)="mostrarConsumo = !mostrarConsumo"
+    >
+      <h5 class="mb-0">Consumo de Agua 💧</h5>
+      <i
+        class="fas"
+        [ngClass]="mostrarConsumo ? 'fa-chevron-up' : 'fa-chevron-down'"
+      ></i>
+    </div>
+
+    <div class="card-body" *ngIf="mostrarConsumo">
+      <div class="mb-3 text-end">
+        <button class="btn btn-outline-success" (click)="exportarConsumoAgua()">
+          Descargar Excel
+        </button>
+      </div>
+      <!-- 🔘 Botones admin -->
+      <div *ngIf="esAdmin" class="mb-3 text-end">
+        <button
+          class="btn btn-success"
+          [disabled]="generando"
+          (click)="generarRecomendacion()"
+        >
+          <span *ngIf="generando">
+            <i class="spinner-border spinner-border-sm me-1"></i> Generando...
+          </span>
+          <span *ngIf="!generando"> Generar Recomendación </span>
+        </button>
+        <button class="btn btn-outline-primary" (click)="abrirModalManual()">
+          Agregar Manualmente
+        </button>
+      </div>
+
+      <!-- 📊 Tabla de Consumo -->
+      <div class="tabla-scroll">
+        <table
+          class="table table-bordered table-striped text-center tabla-fija"
+        >
+          <thead class="table-secondary">
+            <tr>
+              <th>Semana</th>
+              <th>ETo (mm)</th>
+              <th>Precipitación (mm)</th>
+              <th>Kc</th>
+              <th>ETc (mm)</th>
+              <th>Pivote (mm)</th>
+              <th>Cobertura (mm)</th>
+              <th>Carrete (mm)</th>
+              <th>Aspersión (mm)</th>
+              <th *ngIf="esAdmin">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let dato of consumoFiltrado">
+              <td>
+                {{ dato.semana_inicio | date : "dd-MM-yyyy" }} a
+                {{ dato.semana_fin | date : "dd-MM-yyyy" }}
+              </td>
+              <td>{{ dato.eto | number : "1.0-0" }}</td>
+              <td>{{ dato.precipitacion | number : "1.0-0" }}</td>
+              <td>{{ dato.kc | number : "1.1-1" }}</td>
+              <td>{{ dato.etc | number : "1.0-0" }}</td>
+              <td>{{ dato.consumo_pivote | number : "1.0-0" }}</td>
+              <td>{{ dato.consumo_cobertura | number : "1.0-0" }}</td>
+              <td>{{ dato.consumo_carrete | number : "1.0-0" }}</td>
+              <td>{{ dato.consumo_aspersor | number : "1.0-0" }}</td>
+              <td *ngIf="esAdmin">
+                <button
+                  class="btn btn-sm btn-warning me-1"
+                  (click)="editarConsumo(dato)"
+                >
+                  Editar
+                </button>
+                <button
+                  class="btn btn-sm btn-danger"
+                  (click)="eliminarConsumo(dato.id!)"
+                >
+                  Eliminar
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🌦️ Sección: Información Climática -->
+  <div class="card shadow-sm border-dark mb-4">
+    <div
+      class="card-header d-flex justify-content-between align-items-center bg-primary text-white"
+      style="cursor: pointer"
+      (click)="mostrarClima = !mostrarClima"
+    >
+      <h5 class="mb-0">Información Climática 🌦️</h5>
+      <i
+        class="fas"
+        [ngClass]="mostrarClima ? 'fa-chevron-up' : 'fa-chevron-down'"
+      ></i>
+    </div>
+
+    <div class="card-body" *ngIf="mostrarClima">
+      <div class="mb-3 text-end">
+        <button class="btn btn-outline-success" (click)="exportarClima()">
+          Descargar Excel
+        </button>
+      </div>
+      <!-- 🔘 Botones admin -->
+      <div *ngIf="esAdmin" class="mb-3 text-end">
+        <button
+          class="btn btn-success"
+          [disabled]="cargandoClima"
+          (click)="cargarClimaSemanal()"
+        >
+          <span *ngIf="cargandoClima">
+            <i class="spinner-border spinner-border-sm me-1"></i> Cargando...
+          </span>
+          <span *ngIf="!cargandoClima">Ver clima semanal</span>
+        </button>
+        <button
+          class="btn btn-outline-primary"
+          (click)="abrirModalClimaManual()"
+        >
+          Agregar Clima Manual
+        </button>
+      </div>
+
+      <!-- 📊 Tabla de Clima con scroll -->
+      <div class="tabla-scroll">
+        <table
+          class="table table-bordered table-striped text-center tabla-fija"
+        >
+          <thead class="table-secondary">
+            <tr>
+              <th>Fecha</th>
+              <th>Temperatura Mínima (°C)</th>
+              <th>Temperatura Máxima (°C)</th>
+              <th>Temperatura Promedio (°C)</th>
+              <th>Precipitación (mm)</th>
+              <th>Grados Día Base 3</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let dia of climaFiltrado">
+              <td>{{ dia.fecha | date : "dd-MM-yyyy" }}</td>
+              <td>{{ dia.ta_min | number : "1.0-0" }}</td>
+              <td>{{ dia.ta_max | number : "1.0-0" }}</td>
+              <td>{{ dia.ta_prom | number : "1.0-0" }}</td>
+              <td>{{ dia.precipitacion | number : "1.0-0" }}</td>
+              <td>{{ dia.grados_dia | number : "1.0-0" }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📈 Sección: Gráfico Climática -->
+  <div class="card shadow-sm border-dark mb-4">
+    <div
+      class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+      style="cursor: pointer"
+      (click)="mostrarGrafico = !mostrarGrafico"
+    >
+      <h5 class="mb-0">Gráfico de Grados Día (T Base 3) 📈</h5>
+      <i
+        class="fas"
+        [ngClass]="mostrarGrafico ? 'fa-chevron-up' : 'fa-chevron-down'"
+      ></i>
+    </div>
+    <div class="card-body text-end" *ngIf="mostrarGrafico">
+      <button class="btn btn-outline-success mb-3" (click)="descargarGrafico()">
+        Descargar Gráfico
+      </button>
+      <canvas
+        #graficoCanvas
+        baseChart
+        [data]="chartData"
+        [options]="chartOptions"
+        [type]="'line'"
+      ></canvas>
+    </div>
+  </div>
+</main>
+
+<!-- 🔄 Modal combinado: Previsualizar y editar Recomendación -->
+<div
+  class="modal fade"
+  id="modalRecomendacion"
+  tabindex="-1"
+  aria-hidden="true"
+  [ngClass]="{ 'show d-block': mostrarModalRecomendacion }"
+  style="background-color: rgba(0, 0, 0, 0.5)"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" *ngIf="recomendacionPreview">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title">Previsualización Recomendación</h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="mostrarModalRecomendacion = false"
+        ></button>
+      </div>
+      <div class="modal-body row g-3">
+        <div class="col-md-4">
+          <label>Kc:</label>
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            max="2"
+            class="form-control"
+            [(ngModel)]="recomendacionPreview.kc"
+            (ngModelChange)="recalcularValoresRecomendacion()"
+          />
+        </div>
+        <div class="col-md-4">
+          <label>ETo:</label>
+          <input
+            type="number"
+            step="0.01"
+            class="form-control"
+            [(ngModel)]="recomendacionPreview.eto"
+            (ngModelChange)="recalcularValoresRecomendacion()"
+          />
+        </div>
+        <div class="col-md-4">
+          <label>Precipitación (mm):</label>
+          <input
+            type="number"
+            step="0.01"
+            class="form-control"
+            [(ngModel)]="recomendacionPreview.precipitacion"
+          />
+        </div>
+
+        <!-- Campos calculados -->
+        <div
+          class="col-md-3"
+          *ngFor="
+            let key of [
+              'etc',
+              'consumo_pivote',
+              'consumo_cobertura',
+              'consumo_carrete',
+              'consumo_aspersor'
+            ]
+          "
+        >
+          <label>{{ key.replace("_", " ") | titlecase }}:</label>
+          <input
+            type="text"
+            class="form-control"
+            [value]="recomendacionPreview[key]"
+            readonly
+          />
+        </div>
+        <div class="col-md-4">
+          <label>Temporada:</label>
+          <select
+            class="form-select"
+            name="temporada"
+            required
+            [(ngModel)]="recomendacionPreview.id_temporada"
+            #temporadaCtrl="ngModel"
+          >
+            <option [ngValue]="null" disabled>Seleccionar temporada</option>
+            <option *ngFor="let temp of temporadas" [ngValue]="temp.id">
+              {{ temp.nombre }}
+            </option>
+          </select>
+          <div
+            class="text-danger"
+            *ngIf="temporadaCtrl.invalid && temporadaCtrl.touched"
+          >
+            Debes seleccionar una temporada.
+          </div>
+        </div>
+      </div>
+      <hr />
+      <button
+        class="btn btn-outline-secondary mb-3"
+        (click)="mostrarEtoDetalle = !mostrarEtoDetalle"
+      >
+        {{ mostrarEtoDetalle ? "Ocultar" : "Mostrar" }} Detalles de ETo por Día
+      </button>
+
+      <div *ngIf="mostrarEtoDetalle" class="table-responsive">
+        <table class="table table-sm table-bordered text-center">
+          <thead class="table-light">
+            <tr>
+              <th>Fecha</th>
+              <th>ETo (mm)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let fecha of obtenerFechasOrdenadas()">
+              <td>{{ fecha }}</td>
+              <td>{{ recomendacionFechasEto[fecha] }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button
+          class="btn btn-secondary"
+          (click)="mostrarModalRecomendacion = false"
+        >
+          Cancelar
+        </button>
+        <button class="btn btn-primary" (click)="guardarRecomendacion()">
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🟢 Modal: Agregar consumo manual -->
+<div
+  class="modal fade"
+  id="modalManual"
+  tabindex="-1"
+  aria-labelledby="modalManualLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form (ngSubmit)="agregarManual()">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalManualLabel">
+            Agregar Consumo Manual
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Cerrar"
+          ></button>
+        </div>
+        <div class="modal-body row g-3">
+          <div class="col-md-6">
+            <label>Semana inicio:</label>
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="formularioManual.semana_inicio"
+              name="semana_inicio"
+              required
+            />
+          </div>
+          <div class="col-md-6">
+            <label>Semana fin:</label>
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="formularioManual.semana_fin"
+              name="semana_fin"
+              required
+            />
+          </div>
+          <div class="col-md-4">
+            <label>ETo:</label>
+            <input
+              type="number"
+              step="0.01"
+              class="form-control"
+              [(ngModel)]="formularioManual.eto"
+              name="eto"
+              required
+            />
+          </div>
+          <div class="col-md-4">
+            <label>Kc:</label>
+            <input
+              type="number"
+              step="0.01"
+              class="form-control"
+              [(ngModel)]="formularioManual.kc"
+              name="kc"
+              required
+            />
+          </div>
+          <div class="col-md-4">
+            <label>Precipitación:</label>
+            <input
+              type="number"
+              step="0.01"
+              class="form-control"
+              [(ngModel)]="formularioManual.precipitacion"
+              name="precipitacion"
+              required
+            />
+          </div>
+          <div class="col-md-4">
+            <label>Temporada:</label>
+            <select
+              class="form-select"
+              [(ngModel)]="formularioManual.id_temporada"
+              name="temporada"
+              required
+            >
+              <option [ngValue]="null" disabled>Seleccionar temporada</option>
+              <option *ngFor="let temp of temporadas" [ngValue]="temp.id">
+                {{ temp.nombre }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Guardar</button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 🌤️ Modal: Previsualización Clima -->
+<div
+  class="modal fade"
+  id="modalClima"
+  tabindex="-1"
+  aria-hidden="true"
+  [ngClass]="{ 'show d-block': mostrarModalClima }"
+  style="background-color: rgba(0, 0, 0, 0.5)"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Previsualización Información Climática</h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="mostrarModalClima = false"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-4">
+          <label>Temporada:</label>
+          <select
+            class="form-select"
+            [(ngModel)]="temporadaSeleccionadaId"
+            name="temporada"
+            required
+          >
+            <option [ngValue]="null" disabled>Seleccionar temporada</option>
+            <option *ngFor="let temp of temporadas" [ngValue]="temp.id">
+              {{ temp.nombre }}
+            </option>
+          </select>
+        </div>
+        <table class="table table-striped table-sm text-center">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Temperatura Mínima (°C)</th>
+              <th>Temperatura Máxima (°C)</th>
+              <th>Temperatura Promedio (°C)</th>
+              <th>Precipitación (mm)</th>
+              <th>Grados Día</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let dia of climaSemanalPreview">
+              <td>{{ dia.fecha | date : "dd-MM-yyyy" }}</td>
+              <td>
+                <input
+                  type="number"
+                  class="form-control form-control-sm text-center"
+                  [(ngModel)]="dia.temp_min"
+                  step="0.1"
+                />
+              </td>
+              <td>
+                <input
+                  type="number"
+                  class="form-control form-control-sm text-center"
+                  [(ngModel)]="dia.temp_max"
+                  step="0.1"
+                />
+              </td>
+              <td>
+                <input
+                  type="number"
+                  class="form-control form-control-sm text-center"
+                  [(ngModel)]="dia.temp_promedio"
+                  [value]="((dia.temp_min + dia.temp_max) / 2).toFixed(2)"
+                  step="0.1"
+                />
+              </td>
+              <td>
+                <input
+                  type="number"
+                  class="form-control form-control-sm text-center"
+                  [(ngModel)]="dia.precipitacion"
+                  step="0.1"
+                />
+              </td>
+              <td>
+                <span class="badge bg-success">{{
+                  calcularGradosDia(dia.temp_promedio) | number : "1.1-1"
+                }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="mostrarModalClima = false">
+          Cancelar
+        </button>
+        <button class="btn btn-primary" (click)="guardarClima()">
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🟢 Modal: Agregar Clima Manual -->
+<div
+  class="modal fade"
+  id="modalClimaManual"
+  tabindex="-1"
+  aria-hidden="true"
+  [ngClass]="{ 'show d-block': mostrarModalClimaManual }"
+  style="background-color: rgba(0, 0, 0, 0.5)"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form (ngSubmit)="guardarClimaManual()">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title">Agregar Información Climática Manual</h5>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="mostrarModalClimaManual = false"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <!-- 🌱 Temporada -->
+          <div class="mb-3">
+            <label>Temporada</label>
+            <select
+              class="form-select"
+              [(ngModel)]="temporadaSeleccionadaId"
+              name="temporadaManual"
+              required
+            >
+              <option [ngValue]="null" disabled>Seleccionar temporada</option>
+              <option *ngFor="let temp of temporadas" [ngValue]="temp.id">
+                {{ temp.nombre }}
+              </option>
+            </select>
+          </div>
+
+          <!-- 📆 Tabla de ingreso de días -->
+          <table class="table table-striped table-sm text-center">
+            <thead class="table-secondary">
+              <tr>
+                <th>Fecha</th>
+                <th>Temperatura Mínima (°C)</th>
+                <th>Temperatura Máxima (°C)</th>
+                <th>Temperatura Promedio (°C)</th>
+                <th>Precipitación (mm)</th>
+                <th>Grados Día</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let dia of climaManual; let i = index">
+                <td>
+                  <input
+                    type="date"
+                    class="form-control"
+                    [(ngModel)]="dia.fecha"
+                    name="fecha{{ i }}"
+                    required
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    class="form-control form-control-sm text-center"
+                    [(ngModel)]="dia.temp_min"
+                    name="min{{ i }}"
+                    step="0.1"
+                    required
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    class="form-control form-control-sm text-center"
+                    [(ngModel)]="dia.temp_max"
+                    name="max{{ i }}"
+                    step="0.1"
+                    required
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    class="form-control form-control-sm text-center"
+                    [value]="((dia.temp_min + dia.temp_max) / 2).toFixed(2)"
+                    [(ngModel)]="dia.temp_promedio"
+                    name="prom{{ i }}"
+                    step="0.1"
+                    required
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    class="form-control form-control-sm text-center"
+                    [(ngModel)]="dia.precipitacion"
+                    name="precip{{ i }}"
+                    step="0.1"
+                    required
+                  />
+                </td>
+                <td>
+                  <span class="badge bg-primary">{{
+                    calcularGradosDia(+dia.temp_promedio) | number : "1.1-1"
+                  }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <button
+            class="btn btn-outline-primary"
+            type="button"
+            (click)="agregarFilaClima()"
+          >
+            ➕ Agregar Día
+          </button>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            class="btn btn-secondary"
+            (click)="mostrarModalClimaManual = false"
+            type="button"
+          >
+            Cancelar
+          </button>
+          <button class="btn btn-success" type="submit">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 🟡 Modal: Editar Consumo Agua -->
+<div
+  class="modal fade"
+  id="editarkcModal"
+  tabindex="-1"
+  aria-labelledby="editarkcModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" *ngIf="consumoSeleccionado">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title" id="editarkcModalLabel">
+          Editar Kc del Consumo
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label>Semana</label>
+            <div class="form-control" disabled>
+              {{ consumoSeleccionado.semana_inicio | date : "dd-MM-yyyy" }} a
+              {{ consumoSeleccionado.semana_fin | date : "dd-MM-yyyy" }}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label>ETo</label>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              [(ngModel)]="consumoSeleccionado.eto"
+              name="EToEdit"
+              class="form-control"
+            />
+          </div>
+          <div class="mb-3">
+            <label>Kc</label>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              max="2"
+              [(ngModel)]="consumoSeleccionado.kc"
+              name="kcEdit"
+              class="form-control"
+            />
+          </div>
+          <div class="mb-3">
+            <label>Temporada:</label>
+            <select
+              class="form-select"
+              [(ngModel)]="consumoSeleccionado.id_temporada"
+              name="temporadaEdit"
+              class="form-control"
+            >
+              <option *ngFor="let temp of temporadas" [ngValue]="temp.id">
+                {{ temp.nombre }}
+              </option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button class="btn btn-primary" (click)="guardarEdicionConsumo()">
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🔻 Footer -->
+<footer class="zona-footer text-center py-3 bg-dark text-light">
+  <p>© 2025 IANSA Riego. Todos los derechos reservados.</p>
+</footer>

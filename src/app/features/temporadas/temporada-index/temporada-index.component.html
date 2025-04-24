@@ -1,0 +1,147 @@
+<main class="temporadas-main container">
+  <div class="container mt-4">
+    <h2 class="mb-4">Temporadas</h2>
+
+    <div class="text-end mb-3">
+      <button
+        class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#modalTemporada"
+      >
+        Crear Nueva Temporada
+      </button>
+    </div>
+
+    <table class="table table-bordered table-striped text-center">
+      <thead class="table-dark">
+        <tr>
+          <th>Nombre</th>
+          <th>Periodo</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let temporada of temporadas">
+          <td>{{ temporada.nombre }}</td>
+          <td>
+            {{ temporada.fecha_inicio | date : "dd-MM-yyyy" }} a
+            {{ temporada.fecha_fin | date : "dd-MM-yyyy" }}
+          </td>
+          <td>
+            <span
+              [ngClass]="{
+                'text-success': temporada.estado === 'activa',
+                'text-danger': temporada.estado === 'inactiva'
+              }"
+            >
+              {{ temporada.estado | titlecase }}
+            </span>
+          </td>
+          <td>
+            <button
+              class="btn btn-sm"
+              [ngClass]="
+                temporada.estado === 'activa'
+                  ? 'btn-outline-danger'
+                  : 'btn-outline-success'
+              "
+              (click)="cambiarEstado(temporada)"
+            >
+              {{ temporada.estado === "activa" ? "Desactivar" : "Activar" }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+<!-- Modal para crear temporada -->
+<div
+  class="modal fade"
+  id="modalTemporada"
+  tabindex="-1"
+  aria-labelledby="modalTemporadaLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form (ngSubmit)="crearTemporada()">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="modalTemporadaLabel">
+            Agregar Temporada
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Cerrar"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="nombreTemporada" class="form-label">Nombre</label>
+            <input
+              type="text"
+              class="form-control"
+              id="nombreTemporada"
+              [(ngModel)]="nuevaTemporada.nombre"
+              name="nombre"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="fechaInicio" class="form-label">Fecha de Inicio</label>
+            <input
+              type="date"
+              class="form-control"
+              id="fechaInicio"
+              [(ngModel)]="nuevaTemporada.fecha_inicio"
+              name="fecha_inicio"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="fechaFin" class="form-label">Fecha de Fin</label>
+            <input
+              type="date"
+              class="form-control"
+              id="fechaFin"
+              [(ngModel)]="nuevaTemporada.fecha_fin"
+              name="fecha_fin"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="estado" class="form-label">Estado</label>
+            <select
+              class="form-select"
+              id="estado"
+              [(ngModel)]="nuevaTemporada.estado"
+              name="estado"
+              required
+            >
+              <option value="" disabled selected>Seleccionar estado</option>
+              <option value="activa">Activa</option>
+              <option value="inactiva">Inactiva</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Guardar</button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<footer class="temporadas-footer text-center">
+  <p>© 2025 IANSA Riego. Todos los derechos reservados.</p>
+</footer>

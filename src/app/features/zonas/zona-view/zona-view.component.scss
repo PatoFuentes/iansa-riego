@@ -1,0 +1,50 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  color: #000;
+}
+
+.zona-main {
+  flex: 1;
+  padding: 80px 20px 20px;
+  background: #f8f9fa;
+}
+
+.zona-card {
+  color: #000;
+  text-align: center;
+  border-radius: 10px;
+  padding: 20px;
+  background: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: default;
+  transition: none;
+  /* ❌ Sin animación al pasar el cursor */
+}
+
+.zona-footer {
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 15px 0;
+  margin-top: auto;
+}
+
+.zona-detalle {
+  font-size: 1.5rem;
+  /* Similar a h3 */
+  margin: 10px 0;
+}
+
+.tabla-scroll {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.tabla-fija thead th {
+  position: sticky;
+  top: 0;
+  background-color: #f8f9fa;
+  /* Ajusta según el color de tu thead */
+  z-index: 2;
+}

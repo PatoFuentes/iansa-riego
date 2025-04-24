@@ -1,0 +1,87 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  color: #000;
+}
+
+.temporadas-main {
+  flex: 1;
+  padding: 80px 20px 20px;
+  background: #f8f9fa;
+}
+
+.temporadas-footer {
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 15px 0;
+  margin-top: auto;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.card {
+  transition: transform 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-body {
+  min-height: 150px;
+  text-align: center;
+}
+
+.is-invalid {
+  border: 1px solid red;
+  background-color: #fff3f3;
+}
+
+.table {
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+  th {
+    background-color: #343a40;
+    color: white;
+  }
+
+  td,
+  th {
+    vertical-align: middle;
+    text-align: center;
+  }
+
+  tbody tr:hover {
+    background-color: #f1f1f1;
+    transition: background-color 0.2s ease;
+  }
+}
+
+.btn {
+  transition: all 0.2s ease;
+}
+
+.btn-outline-success:hover {
+  background-color: #198754;
+  color: white;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+.text-end {
+  margin-bottom: 1rem;
+}

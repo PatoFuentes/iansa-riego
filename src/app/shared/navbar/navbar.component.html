@@ -1,0 +1,127 @@
+<nav class="navbar navbar-dark bg-dark fixed-top">
+  <div
+    class="container-fluid d-flex justify-content-between align-items-center"
+  >
+    <!-- 🔵 Logo a la izquierda -->
+    <a routerLink="/" class="navbar-brand d-flex align-items-center">
+      <img
+        src="assets/img/eiansa-2025.svg"
+        alt="IANSA"
+        height="36"
+        class="me-2"
+      />
+    </a>
+
+    <!-- 🟣 Zona derecha: Botón de conceptos + botón menú -->
+    <div class="d-flex align-items-center">
+      <!-- 📘 Botón de Conceptos -->
+      <button
+        class="btn btn-outline-light me-2 d-md-inline-block"
+        routerLink="/conceptos"
+      >
+        Conceptos de Riego
+      </button>
+
+      <!-- ☰ Botón de menú (solo visible en móviles) -->
+      <button
+        class="btn btn-outline-light btn-toggle-menu"
+        (click)="toggleMenu()"
+      >
+        ☰
+      </button>
+    </div>
+
+    <!-- Menú desplegable -->
+    <div [ngClass]="{ 'nav-menu': true, 'nav-menu-open': menuOpen }">
+      <a routerLink="/regiones" class="nav-link" (click)="toggleMenu()"
+        >🌍 Regiones</a
+      >
+      <a
+        *ngIf="esAdmin"
+        routerLink="/usuarios"
+        class="nav-link"
+        (click)="toggleMenu()"
+        >👤 Usuarios</a
+      >
+      <a
+        *ngIf="esAdmin"
+        routerLink="/temporadas"
+        class="nav-link"
+        (click)="toggleMenu()"
+        >📆 Temporadas</a
+      >
+      <hr class="bg-light" />
+      <span *ngIf="usuarioLogueado" class="text-white mb-2 d-block"
+        >👋 {{ usuarioLogueado.nombre }}</span
+      >
+      <button
+        *ngIf="usuarioLogueado"
+        class="btn btn-sm btn-outline-light w-100 mb-1"
+        (click)="cerrarSesion()"
+      >
+        Cerrar sesión
+      </button>
+      <button
+        *ngIf="!usuarioLogueado"
+        class="btn btn-sm btn-outline-light w-100"
+        data-bs-toggle="modal"
+        data-bs-target="#loginModal"
+      >
+        Iniciar sesión
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Modal de Login -->
+<div
+  class="modal fade"
+  id="loginModal"
+  tabindex="-1"
+  aria-labelledby="loginModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="loginModalLabel">Iniciar sesión</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="correo" class="form-label">Correo electrónico</label>
+            <input
+              type="email"
+              [(ngModel)]="loginData.correo"
+              name="correo"
+              class="form-control"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="contrasenia" class="form-label">Contraseña</label>
+            <input
+              type="password"
+              [(ngModel)]="loginData.contrasenia"
+              name="contrasenia"
+              class="form-control"
+            />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button class="btn btn-primary" (click)="iniciarSesion()">
+          Iniciar sesión
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

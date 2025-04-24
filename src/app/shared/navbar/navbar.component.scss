@@ -1,0 +1,31 @@
+.nav-menu {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  top: 60px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.95);
+  padding: 15px;
+  border-radius: 8px;
+  z-index: 1000;
+  min-width: 200px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.nav-menu.nav-menu-open {
+  display: flex;
+}
+
+.nav-menu .nav-link {
+  color: white;
+  text-decoration: none;
+  padding: 8px 0;
+  transition: all 0.2s ease;
+}
+
+.nav-menu .nav-link:hover {
+  background-color: #0b5394;
+  color: white;
+  padding-left: 10px;
+  border-radius: 4px;
+}

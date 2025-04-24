@@ -1,0 +1,152 @@
+<main class="region-main container">
+  <h1 class="text-center text-dark mt-5">REMOLACHA</h1>
+  <div class="d-flex justify-content-between mb-3">
+    <button
+      class="btn btn-success"
+      data-bs-toggle="modal"
+      data-bs-target="#nuevaRegionModal"
+      *ngIf="esAdmin"
+    >
+      Agregar Region
+    </button>
+    <button
+      class="btn btn-secondary"
+      data-bs-toggle="modal"
+      data-bs-target="#reactivarRegionesModal"
+      *ngIf="esAdmin"
+    >
+      Reactivar Regiones
+    </button>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4" *ngFor="let region of regiones">
+      <div
+        class="card shadow-sm border-primary mb-4 text-center region-card"
+        (click)="verRegion(region.id)"
+        role="button"
+      >
+        <div
+          class="card-body d-flex justify-content-center align-items-center text-white"
+          [ngStyle]="{
+            'background-image': 'url(' + obtenerImagenFondo(region) + ')',
+            'background-size': 'cover',
+            'background-position': 'center',
+            height: '150px'
+          }"
+        >
+          <h3
+            class="card-title m-0 fw-bold bg-dark bg-opacity-50 px-3 py-1 rounded"
+          >
+            {{ region.nombre }}
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Modal para agregar region -->
+<div
+  class="modal fade"
+  id="nuevaRegionModal"
+  tabindex="-1"
+  aria-labelledby="nuevaRegionLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form (ngSubmit)="agregarRegion()" #regionForm="ngForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="nuevaRegionLabel">Nueva Region</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Cerrar"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="nombreRegion" class="form-label">Nombre</label>
+            <input
+              type="text"
+              id="nombreRegion"
+              class="form-control"
+              [(ngModel)]="nuevaRegion"
+              name="nombre"
+              required
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="regionForm.invalid"
+          >
+            Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Modal Reactivar Regiones -->
+<div
+  class="modal fade"
+  id="reactivarRegionesModal"
+  tabindex="-1"
+  aria-labelledby="reactivarRegionesModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="reactivarRegionesModalLabel">
+          Regiones Inactivas
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <input
+          type="text"
+          class="form-control mb-3"
+          placeholder="Buscar region por nombre"
+          [(ngModel)]="filtroNombreRegion"
+        />
+
+        <ul class="list-group">
+          <li
+            *ngFor="let region of regionesInactivasFiltradas()"
+            class="list-group-item d-flex justify-content-between align-items-center"
+          >
+            {{ region.nombre }}
+            <button
+              class="btn btn-sm btn-outline-success"
+              (click)="activarRegion(region.id)"
+            >
+              Activar
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="region-footer text-center py-3 bg-dark text-light">
+  <p>© 2025 IANSA Riego. Todos los derechos reservados.</p>
+</footer>

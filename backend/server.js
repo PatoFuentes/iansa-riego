@@ -11,10 +11,11 @@ app.use(express.json()); // Permite recibir datos en formato JSON
 
 // Configuración de la base de datos
 const db = mysql.createConnection({
+  host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  socketPath: process.env.DB_HOST,
+  // socketPath: process.env.DB_HOST,
 });
 
 db.connect((err) => {

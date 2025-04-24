@@ -1,0 +1,55 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  color: #000;
+}
+
+.region-main {
+  flex: 1;
+  padding: 0.1px 20px 20px;
+  background: #f8f9fa;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.region-card {
+  cursor: default;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s;
+  text-align: center;
+  color: #000;
+}
+
+.region-footer {
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 15px 0;
+  margin-top: auto;
+}
+
+.zona-card {
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+.zona-card:hover {
+  background-color: #f0f0f0;
+}
+
+.banner-sanignacio {
+  height: calc((135vh - 60px) / 3);
+  background-image: url("/assets/img/san-ignacio-23.webp");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.scrollable-list {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
