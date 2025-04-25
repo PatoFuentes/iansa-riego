@@ -10,13 +10,23 @@ app.use(cors());
 app.use(express.json()); // Permite recibir datos en formato JSON
 
 // Configuración de la base de datos
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  // socketPath: process.env.DB_HOST,
-});
+
+const dbConfig = process.env.DB_HOST.startsWith("/cloudsql")
+  ? {
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      socketPath: process.env.DB_HOST,
+    }
+  : {
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT || 3306,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+    };
+
+const db = mysql.createConnection(dbConfig);
 
 db.connect((err) => {
   if (err) {
