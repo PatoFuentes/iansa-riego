@@ -11,7 +11,7 @@ import { ToastrService, ToastrModule } from 'ngx-toastr';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ClimaZona } from '../../../core/models/clima.model';
-import { environment } from '../../../../environments/enviroment';
+import { environment } from '../../../../environments/environment';
 import { TemporadasService } from '../../../core/services/temporadas.service';
 import { Temporada } from '../../../core/models/temporada.model';
 import Swal from 'sweetalert2';

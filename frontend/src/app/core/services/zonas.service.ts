@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Zona } from '../models/zona.model';
 import { ClimaZona } from '../models/clima.model';
-import { environment } from '../../../environments/enviroment';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ZonasService {
