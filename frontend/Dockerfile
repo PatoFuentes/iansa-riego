@@ -6,10 +6,8 @@ COPY src/ ./src/
 COPY angular.json ./
 COPY tsconfig.json ./
 COPY tsconfig.app.json ./
-COPY .dockerignore ./
-RUN npm run build -- --configuration production
+RUN npm run build -- --configuration production --base-href /
 
 FROM nginx:alpine
 COPY --from=build /app/dist/frontend-riego /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
-
