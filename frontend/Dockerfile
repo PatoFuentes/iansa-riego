@@ -6,7 +6,6 @@ COPY src/ ./src/
 COPY angular.json ./
 COPY tsconfig.json ./
 COPY tsconfig.app.json ./
-COPY tsconfig.spec.json ./
 COPY .dockerignore ./
 RUN npm run build -- --configuration production
 
