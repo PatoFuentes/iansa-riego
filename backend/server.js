@@ -30,10 +30,16 @@ const db = mysql.createConnection(dbConfig);
 
 db.connect((err) => {
   if (err) {
-    console.error("Error de conexión a la base de datos:", err);
-    return;
+    console.error("Error de conexión a la base de datos:", err.message);
+    process.exit(1); // Sale explícitamente si no conecta
+  } else {
+    console.log("✅ Conectado a la base de datos MySQL");
+
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+      console.log(`Servidor corriendo en http://localhost:${PORT}`);
+    });
   }
-  console.log("Conectado a la base de datos MySQL");
 });
 
 // Regiones
@@ -810,10 +816,4 @@ app.put("/temporadas/:id/activar", (req, res) => {
 
     res.json({ message: "Temporada activada" });
   });
-});
-
-// Iniciar el servidor
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
