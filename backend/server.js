@@ -11,15 +11,16 @@ app.use(express.json()); // Permite recibir datos en formato JSON
 
 // Configuración de la base de datos
 
+const dbHost = process.env.DB_HOST || '';
 const dbConfig = process.env.DB_HOST.startsWith("/cloudsql")
   ? {
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      socketPath: process.env.DB_HOST,
+      socketPath: dbHost,
     }
   : {
-      host: process.env.DB_HOST,
+      host: dbHost,
       port: process.env.DB_PORT || 3306,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
