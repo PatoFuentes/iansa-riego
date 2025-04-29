@@ -11,7 +11,6 @@ import { ToastrService, ToastrModule } from 'ngx-toastr';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ClimaZona } from '../../../core/models/clima.model';
-import { environment } from '../../../../environments/environment';
 import { TemporadasService } from '../../../core/services/temporadas.service';
 import { Temporada } from '../../../core/models/temporada.model';
 import Swal from 'sweetalert2';
@@ -20,6 +19,7 @@ import { ChartData, Chart, registerables } from 'chart.js';
 import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
 import annotationPlugin from 'chartjs-plugin-annotation';
+import { CrawlerService } from '../../../core/services/crawler.service';
 
 declare var bootstrap: any;
 
@@ -97,7 +97,8 @@ export class ZonaViewComponent implements OnInit {
     private toastr: ToastrService,
     private http: HttpClient,
     private aguaService: AguaService,
-    private temporadasService: TemporadasService
+    private temporadasService: TemporadasService,
+    private crawlerService: CrawlerService
   ) {}
 
   ngOnInit(): void {
@@ -150,11 +151,14 @@ export class ZonaViewComponent implements OnInit {
       this.generando = false;
       return;
     }
+    if (!this.zona.estacion_id || !this.zona.estacion_api) {
+      this.toastr.warning('Faltan datos de la estación');
+      this.cargandoClima = false;
+      return;
+    }
 
-    this.http
-      .get<any>(
-        `${environment.apiUrl}/api/eto?estacion_id=${this.zona.estacion_id}&estacion_api=${this.zona.estacion_api}`
-      )
+    this.crawlerService
+      .obtenerETo(this.zona.estacion_id, this.zona.estacion_api)
       .subscribe({
         next: (data) => {
           if (!data || !data.fechas) {
@@ -202,7 +206,6 @@ export class ZonaViewComponent implements OnInit {
             etoPorFechaCompleto[fecha] = valor ?? promedio;
           }
 
-          // 🔢 Cálculos
           const EToTotal = Object.values(etoPorFechaCompleto).reduce(
             (a: number, b: number) => a + b,
             0
@@ -223,7 +226,8 @@ export class ZonaViewComponent implements OnInit {
           this.mostrarModalRecomendacion = true;
           this.generando = false;
         },
-        error: () => {
+        error: (err) => {
+          console.error('❌ Error al obtener datos del clima:', err);
           this.toastr.error('❌ Error al obtener datos del clima');
           this.generando = false;
         },
@@ -321,21 +325,22 @@ export class ZonaViewComponent implements OnInit {
 
   cargarClimaSemanal(): void {
     this.cargandoClima = true;
+
     if (!this.zona.estacion_id || !this.zona.estacion_api) {
       this.toastr.warning('Faltan datos de la estación');
+      this.cargandoClima = false;
       return;
     }
 
-    this.http
-      .get<any>(
-        `${environment.apiUrl}/api/clima-semanal?estacion_id=${this.zona.estacion_id}&estacion_api=${this.zona.estacion_api}`
-      )
+    this.crawlerService
+      .obtenerClimaSemanal(this.zona.estacion_id, this.zona.estacion_api)
       .subscribe({
         next: (data) => {
           if (!data.length) {
             this.toastr.info(
               'No se encontraron datos climáticos para mostrar.'
             );
+            this.cargandoClima = false;
             return;
           }
 
@@ -343,12 +348,14 @@ export class ZonaViewComponent implements OnInit {
           this.mostrarModalClima = true; // 🟢 Mostrar modal
           this.cargandoClima = false;
         },
-        error: () => {
+        error: (err) => {
+          console.error('❌ Error al obtener datos climáticos:', err);
           this.toastr.error('❌ Error al obtener los datos climáticos');
           this.cargandoClima = false;
         },
       });
   }
+
   guardarClima(): void {
     if (!this.zona || !this.climaSemanalPreview.length) return;
 
