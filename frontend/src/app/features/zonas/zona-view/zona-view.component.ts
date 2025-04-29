@@ -647,6 +647,7 @@ export class ZonaViewComponent implements OnInit {
       suma += isNaN(grados) ? 0 : grados;
       gradosDiaAcumulado.push(suma);
     }
+    const ultimoValor = gradosDiaAcumulado[gradosDiaAcumulado.length - 1];
 
     this.chartData = {
       labels,
@@ -658,6 +659,19 @@ export class ZonaViewComponent implements OnInit {
           backgroundColor: 'rgba(0, 128, 0, 0.2)',
           fill: true,
           tension: 0.3,
+        },
+        {
+          data: new Array(gradosDiaAcumulado.length - 1)
+            .fill(null)
+            .concat(ultimoValor),
+          label: `Total acumulado: ${Math.round(ultimoValor)} GDA`,
+          borderColor: 'transparent',
+          backgroundColor: 'red',
+          pointRadius: 6,
+          pointHoverRadius: 8,
+          pointBackgroundColor: 'red',
+          fill: false,
+          type: 'line',
         },
       ],
     };
