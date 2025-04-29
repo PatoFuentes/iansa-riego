@@ -1,1 +1,288 @@
-<p>usuario-index works!</p>
+<main class="usuario-main container">
+  <h1 class="text-center text-dark mt-5">Listado de Usuarios</h1>
+
+  <div class="d-flex justify-content-between mb-3">
+    <button
+      class="btn btn-success"
+      data-bs-toggle="modal"
+      data-bs-target="#nuevoUsuarioModal"
+    >
+      Agregar Usuario
+    </button>
+
+    <div class="mb-3">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Buscar usuario por nombre..."
+        [(ngModel)]="filtroNombreUsuario"
+      />
+    </div>
+
+    <button
+      class="btn btn-secondary"
+      data-bs-toggle="modal"
+      data-bs-target="#usuariosInactivosModal"
+    >
+      Reactivar Usuario
+    </button>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-md-4" *ngFor="let usuario of usuariosFiltrados()">
+      <div
+        class="card shadow-sm border-primary mb-4 usuario-card"
+        (click)="abrirModalEditar(usuario)"
+      >
+        <div
+          class="card-body d-flex flex-column align-items-center justify-content-center"
+        >
+          <h5 class="card-title">{{ usuario.nombre }}</h5>
+          <p class="mb-1">{{ usuario.rut }}</p>
+          <p class="mb-1">{{ usuario.telefono }}</p>
+          <p class="mb-1 text-muted">{{ usuario.tipo | titlecase }}</p>
+          <button
+            class="btn btn-outline-danger btn-sm mt-2"
+            (click)="desactivarUsuario(usuario.rut); $event.stopPropagation()"
+            *ngIf="usuario.estado === 'activo'"
+          >
+            Desactivar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Modal para agregar usuario -->
+<div
+  class="modal fade"
+  id="nuevoUsuarioModal"
+  tabindex="-1"
+  aria-labelledby="nuevoUsuarioModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="nuevoUsuarioModalLabel">Agregar Usuario</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-2">
+            <label>RUT</label>
+            <input
+              [(ngModel)]="nuevoUsuario.rut"
+              name="rut"
+              class="form-control"
+              [ngClass]="{ 'is-invalid': errorRut }"
+            />
+          </div>
+          <div class="mb-2">
+            <label>Nombre</label>
+            <input
+              [(ngModel)]="nuevoUsuario.nombre"
+              name="nombre"
+              class="form-control"
+            />
+          </div>
+          <div class="mb-2">
+            <label>Contraseña</label>
+            <input
+              [(ngModel)]="nuevoUsuario.contrasenia"
+              name="contrasenia"
+              type="password"
+              class="form-control"
+              [ngClass]="{ 'is-invalid': errorContrasenia }"
+            />
+          </div>
+          <div class="mb-2">
+            <label>Teléfono (+56912345678)</label>
+            <input
+              [(ngModel)]="nuevoUsuario.telefono"
+              name="telefono"
+              class="form-control"
+              [ngClass]="{ 'is-invalid': errorTelefono }"
+            />
+          </div>
+          <div class="mb-2">
+            <label>Correo electrónico</label>
+            <input
+              [(ngModel)]="nuevoUsuario.correo"
+              name="correo"
+              class="form-control"
+              [ngClass]="{ 'is-invalid': errorCorreo }"
+            />
+          </div>
+          <div class="mb-3">
+            <label>Tipo</label>
+            <select
+              [(ngModel)]="nuevoUsuario.tipo"
+              name="tipo"
+              class="form-select"
+            >
+              <option value="administrador">Administrador</option>
+              <option value="tecnico">Técnico</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button class="btn btn-primary" (click)="agregarUsuario()">
+          Agregar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para editar usuario -->
+<div
+  class="modal fade"
+  id="editarUsuarioModal"
+  tabindex="-1"
+  aria-labelledby="editarUsuarioModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title" id="editarUsuarioModalLabel">Editar Usuario</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-2">
+            <label>RUT</label>
+            <input
+              [(ngModel)]="usuarioSeleccionado.rut"
+              name="rutEdit"
+              class="form-control"
+              disabled
+            />
+          </div>
+          <div class="mb-2">
+            <label>Nombre</label>
+            <input
+              [(ngModel)]="usuarioSeleccionado.nombre"
+              name="nombreEdit"
+              class="form-control"
+            />
+          </div>
+          <div class="mb-2">
+            <label>Contraseña</label>
+            <input
+              [(ngModel)]="usuarioSeleccionado.contrasenia"
+              name="contraseniaEdit"
+              type="password"
+              class="form-control"
+              [ngClass]="{ 'is-invalid': errorContrasenia }"
+            />
+          </div>
+          <div class="mb-2">
+            <label>Teléfono (+56912345678)</label>
+            <input
+              [(ngModel)]="usuarioSeleccionado.telefono"
+              name="telefonoEdit"
+              class="form-control"
+              [ngClass]="{ 'is-invalid': errorTelefono }"
+            />
+          </div>
+          <div class="mb-2">
+            <label>Correo</label>
+            <input
+              [(ngModel)]="usuarioSeleccionado.correo"
+              name="correoEdit"
+              class="form-control"
+              [ngClass]="{ 'is-invalid': errorCorreo }"
+            />
+          </div>
+          <div class="mb-3">
+            <label>Tipo</label>
+            <select
+              [(ngModel)]="usuarioSeleccionado.tipo"
+              name="tipoEdit"
+              class="form-select"
+            >
+              <option value="administrador">Administrador</option>
+              <option value="tecnico">Técnico</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button class="btn btn-primary" (click)="guardarCambiosUsuario()">
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para usuarios inactivos -->
+<div
+  class="modal fade"
+  id="usuariosInactivosModal"
+  tabindex="-1"
+  aria-labelledby="usuariosInactivosModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-secondary text-white">
+        <h5 class="modal-title" id="usuariosInactivosModalLabel">
+          Usuarios Inactivos
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <input
+          [(ngModel)]="filtroNombreUsuario"
+          class="form-control mb-3"
+          placeholder="Filtrar por nombre..."
+        />
+
+        <ul class="list-group">
+          <li
+            class="list-group-item d-flex justify-content-between align-items-center"
+            *ngFor="let usuario of usuariosInactivosFiltrados()"
+          >
+            {{ usuario.nombre }}
+            <button
+              class="btn btn-sm btn-outline-success"
+              (click)="reactivarUsuario(usuario.rut)"
+            >
+              Activar
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="usuario-footer text-center py-3 bg-dark text-light">
+  <p>© 2025 IANSA Riego. Todos los derechos reservados.</p>
+</footer>

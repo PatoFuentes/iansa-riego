@@ -1,0 +1,45 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  color: #000;
+}
+
+.usuario-main {
+  flex: 1;
+  padding: 80px 20px 20px;
+  background: #f8f9fa;
+}
+
+.usuario-footer {
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 15px 0;
+  margin-top: auto;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: black;
+}
+
+.card {
+  transition: transform 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-body {
+  min-height: 150px;
+  text-align: center;
+}
+
+.is-invalid {
+  border: 1px solid red;
+  background-color: #fff3f3;
+}
