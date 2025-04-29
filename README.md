@@ -1,59 +1,140 @@
-# FrontendRiego
+# 🌱 Plataforma de Riego - Proyecto de Gestión de Consumo de Agua
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.9.
+Bienvenido a la plataforma de riego, una aplicación web diseñada para gestionar, analizar y recomendar el consumo de agua de zonas de riego basadas en datos meteorológicos reales.
 
-## Development server
+---
 
-To start a local development server, run:
+## 🔄 Tecnologías Utilizadas
 
+| Tecnología | Propósito |
+|:-----------|:----------|
+| Angular 19  | Frontend SPA |
+| Node.js + Express  | Backend API REST |
+| MySQL/MariaDB | Base de datos |
+| Puppeteer  | Crawler automático de estaciones meteorológicas |
+| Nginx | Servidor para Angular en producción |
+| Google Cloud Platform (GCP) | Infraestructura cloud (Cloud Run, Cloud SQL, Cloud Build) |
+| GitHub Actions | Automatización CI/CD |
+
+---
+
+## 🚀 Despliegue Automático
+
+- **CI/CD:** Cada `git push` a `main` ejecuta:
+  - Lint + Pruebas Unitarias.
+  - Build de Backend (Node.js) y Frontend (Angular).
+  - Deploy automático a **Cloud Run**.
+- **Docker:** Backend y frontend se empaquetan como contenedores independientes.
+- **Cloud Build:** Builda y despliega automáticamente.
+
+---
+
+## 🔧 Levantamiento en Local
+
+### 1. Clonar el proyecto
 ```bash
-ng serve
+git clone https://github.com/tu-usuario/proyecto-riego.git
+cd proyecto-riego
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+### 2. Frontend
 ```bash
-ng generate component component-name
+cd frontend
+npm install
+npm run start
+```
+Acceder a `http://localhost:4200`
+
+### 3. Backend
+```bash
+cd backend
+npm install
+node server.js
+```
+Acceder a `http://localhost:3000`
+
+### 4. Base de Datos
+- Crear base de datos `iansa_riego`.
+- Importar el esquema necesario.
+
+### Variables de entorno necesarias (.env en backend)
+```bash
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD= (según configuración local)
+DB_NAME=iansa_riego
+PORT=3000
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
+
+## 📂 Estructura de Carpetas
 
 ```bash
-ng generate --help
+/
+|- frontend/          # Proyecto Angular 19
+|- backend/           # Proyecto Node.js Express + Crawler
+|- cloudbuild.yaml    # Pipeline para GCP
+|- .github/workflows/ # Workflows GitHub Actions (tests + deploy)
+|- README.md
+|- .gitignore
 ```
 
-## Building
+---
 
-To build the project run:
+## 🔑 Secrets en GitHub
 
-```bash
-ng build
-```
+| Secret | Descripción |
+|:-------|:------------|
+| GCP_SA_KEY | JSON de la cuenta de servicio de GCP para deploy |
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+---
 
-## Running unit tests
+## 💎 Características Principales
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+- 📊 **Consumo de Agua Semanal:** Visualización de datos desde estaciones meteorológicas.
+- 🔗 **Crawler Automático:** Obtención de ETo semanal.
+- 📈 **Gráficos y Exportación:** Tablas exportables en Excel.
+- 🌧️ **Recomendaciones Dinámicas:** Cálculo automático de necesidades de riego.
+- 📅 **Gestor de Usuarios:** Administradores y Técnicos.
 
-```bash
-ng test
-```
+---
 
-## Running end-to-end tests
+## 🚫 No Deben Subirse a GitHub
 
-For end-to-end (e2e) testing, run:
+- `node_modules/`
+- `.env`
+- `.angular/`
+- `dist/`
+- `.vscode/`, `.idea/`, otros de entorno local
 
-```bash
-ng e2e
-```
+---
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## 🏁 Estado del Proyecto
 
-## Additional Resources
+- 📅 Despliegue activo con CI/CD
+- 🔄 Backend y Frontend corriendo en Cloud Run
+- 📊 Mejoras futuras: optimización crawler
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+---
+
+## 📚 Cómo Contribuir
+
+✍️ Si deseas colaborar en este proyecto:
+
+1. Realiza un fork de este repositorio.
+2. Crea una nueva rama (`git checkout -b feature/nueva-funcionalidad`).
+3. Realiza tus cambios.
+4. Asegúrate de pasar los tests y el linting (`npm run lint`, `npm run test`).
+5. Haz commit de tus cambios (`git commit -m 'feat: describe tu funcionalidad'`).
+6. Envía un Pull Request a la rama `main`.
+
+**Notas:**
+- Sigue las buenas prácticas de programación y estilo definido en el proyecto.
+- Cualquier duda o sugerencia, puedes abrir una "Issue".
+
+---
+
+
+
