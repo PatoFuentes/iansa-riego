@@ -1,0 +1,1113 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../deploy/">
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.12">
+    
+    
+      
+        <title>Base de Datos - Plataforma de Riego</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.2afb09e1.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#base-de-datos-iansa_riego" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href=".." title="Plataforma de Riego" class="md-header__button md-logo" aria-label="Plataforma de Riego" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Plataforma de Riego
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Base de Datos
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Pestañas" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Inicio
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../frontend/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Frontend
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../backend/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Backend
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../crawler/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Crawler
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../deploy/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Despliegue
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Base de Datos
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../uso.md" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Guía de Uso
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Plataforma de Riego" class="md-nav__button md-logo" aria-label="Plataforma de Riego" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Plataforma de Riego
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Inicio
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../frontend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Frontend
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Backend
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../crawler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Crawler
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Despliegue
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Base de Datos
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Base de Datos
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#esquema-general" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧱 Esquema General
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tablas-principales" class="md-nav__link">
+    <span class="md-ellipsis">
+      📋 Tablas Principales
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📋 Tablas Principales">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usuarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔐 usuarios
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#regiones-y-zonas" class="md-nav__link">
+    <span class="md-ellipsis">
+      🌎 regiones y zonas
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#temporadas" class="md-nav__link">
+    <span class="md-ellipsis">
+      📆 temporadas
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#consumo_agua" class="md-nav__link">
+    <span class="md-ellipsis">
+      💧 consumo_agua
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recomendaciones" class="md-nav__link">
+    <span class="md-ellipsis">
+      📈 recomendaciones
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consideraciones-de-seguridad" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔐 Consideraciones de Seguridad
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#posibles-mejoras" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧪 Posibles Mejoras
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../uso.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Guía de Uso
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#esquema-general" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧱 Esquema General
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tablas-principales" class="md-nav__link">
+    <span class="md-ellipsis">
+      📋 Tablas Principales
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📋 Tablas Principales">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usuarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔐 usuarios
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#regiones-y-zonas" class="md-nav__link">
+    <span class="md-ellipsis">
+      🌎 regiones y zonas
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#temporadas" class="md-nav__link">
+    <span class="md-ellipsis">
+      📆 temporadas
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#consumo_agua" class="md-nav__link">
+    <span class="md-ellipsis">
+      💧 consumo_agua
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recomendaciones" class="md-nav__link">
+    <span class="md-ellipsis">
+      📈 recomendaciones
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consideraciones-de-seguridad" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔐 Consideraciones de Seguridad
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#posibles-mejoras" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧪 Posibles Mejoras
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="base-de-datos-iansa_riego">🗄️ Base de Datos - <code>iansa_riego</code><a class="headerlink" href="#base-de-datos-iansa_riego" title="Permanent link">&para;</a></h1>
+<p>La base de datos utilizada por el sistema se llama <code>iansa_riego</code> y está diseñada en <strong>MySQL/MariaDB</strong>. Contiene las entidades necesarias para modelar zonas de riego, usuarios, recomendaciones, consumo de agua, estaciones meteorológicas y temporadas.</p>
+<hr />
+<h2 id="esquema-general">🧱 Esquema General<a class="headerlink" href="#esquema-general" title="Permanent link">&para;</a></h2>
+<div class="codehilite"><pre><span></span><code><span class="err">📦</span><span class="w"> </span><span class="n">iansa_riego</span>
+<span class="err">├──</span><span class="w"> </span><span class="n">usuarios</span>
+<span class="err">├──</span><span class="w"> </span><span class="n">regiones</span>
+<span class="err">├──</span><span class="w"> </span><span class="n">zonas</span>
+<span class="err">├──</span><span class="w"> </span><span class="n">temporadas</span>
+<span class="err">├──</span><span class="w"> </span><span class="n">recomendaciones</span>
+<span class="err">├──</span><span class="w"> </span><span class="n">consumo_agua</span>
+</code></pre></div>
+
+<hr />
+<h2 id="tablas-principales">📋 Tablas Principales<a class="headerlink" href="#tablas-principales" title="Permanent link">&para;</a></h2>
+<h3 id="usuarios">🔐 <code>usuarios</code><a class="headerlink" href="#usuarios" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rut</td>
+<td>VARCHAR(12)</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>nombre</td>
+<td>VARCHAR(100)</td>
+<td>Nombre completo</td>
+</tr>
+<tr>
+<td>telefono</td>
+<td>VARCHAR(20)</td>
+<td>Teléfono de contacto</td>
+</tr>
+<tr>
+<td>correo</td>
+<td>VARCHAR(100)</td>
+<td>Correo electrónico (login)</td>
+</tr>
+<tr>
+<td>tipo</td>
+<td>ENUM</td>
+<td><code>administrador</code> / <code>tecnico</code></td>
+</tr>
+<tr>
+<td>estado</td>
+<td>TINYINT</td>
+<td>1 = Activo, 0 = Inactivo</td>
+</tr>
+<tr>
+<td>contrasenia</td>
+<td>TEXT</td>
+<td>Hash de contraseña</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="regiones-y-zonas">🌎 <code>regiones</code> y <code>zonas</code><a class="headerlink" href="#regiones-y-zonas" title="Permanent link">&para;</a></h3>
+<p><strong><code>regiones</code></strong> define agrupaciones geográficas.<br />
+<strong><code>zonas</code></strong> representa áreas específicas de riego.</p>
+<table>
+<thead>
+<tr>
+<th>Campo en zonas</th>
+<th>Tipo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT</td>
+<td>Identificador</td>
+</tr>
+<tr>
+<td>nombre</td>
+<td>VARCHAR(100)</td>
+<td>Nombre de la zona</td>
+</tr>
+<tr>
+<td>region_id</td>
+<td>FK</td>
+<td>Relación a <code>regiones</code></td>
+</tr>
+<tr>
+<td>estacion_id</td>
+<td>VARCHAR(50)</td>
+<td>ID de estación agrometeorológica</td>
+</tr>
+<tr>
+<td>estacion_api</td>
+<td>VARCHAR(10)</td>
+<td>Fuente de datos (<code>INIA</code>, etc.)</td>
+</tr>
+<tr>
+<td>latitud</td>
+<td>DECIMAL</td>
+<td>Coordenada geográfica</td>
+</tr>
+<tr>
+<td>longitud</td>
+<td>DECIMAL</td>
+<td>Coordenada geográfica</td>
+</tr>
+<tr>
+<td>activa</td>
+<td>BOOLEAN</td>
+<td>Estado lógico</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="temporadas">📆 <code>temporadas</code><a class="headerlink" href="#temporadas" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT</td>
+<td>ID autoincremental</td>
+</tr>
+<tr>
+<td>nombre</td>
+<td>VARCHAR(100)</td>
+<td>Ej: "Primavera 2025"</td>
+</tr>
+<tr>
+<td>fecha_inicio</td>
+<td>DATE</td>
+<td>Inicio de temporada</td>
+</tr>
+<tr>
+<td>fecha_fin</td>
+<td>DATE</td>
+<td>Fin de temporada</td>
+</tr>
+<tr>
+<td>activa</td>
+<td>BOOLEAN</td>
+<td>Si está disponible para uso</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="consumo_agua">💧 <code>consumo_agua</code><a class="headerlink" href="#consumo_agua" title="Permanent link">&para;</a></h3>
+<p>Esta tabla guarda los datos semanales de consumo y ETo calculados o importados.</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>zona_id</td>
+<td>FK</td>
+<td>Relación a <code>zonas</code></td>
+</tr>
+<tr>
+<td>semana_inicio</td>
+<td>DATE</td>
+<td>Fecha de inicio del periodo semanal</td>
+</tr>
+<tr>
+<td>semana_fin</td>
+<td>DATE</td>
+<td>Fecha de término del periodo semanal</td>
+</tr>
+<tr>
+<td>eto</td>
+<td>FLOAT</td>
+<td>Evapotranspiración potencial semanal</td>
+</tr>
+<tr>
+<td>kc</td>
+<td>FLOAT</td>
+<td>Coeficiente de cultivo</td>
+</tr>
+<tr>
+<td>etc</td>
+<td>FLOAT</td>
+<td>Evapotranspiración del cultivo</td>
+</tr>
+<tr>
+<td>riego_aspersor</td>
+<td>FLOAT</td>
+<td>Recomendación en litros</td>
+</tr>
+<tr>
+<td>riego_goteo</td>
+<td>FLOAT</td>
+<td>Recomendación en litros</td>
+</tr>
+<tr>
+<td>riego_pivote</td>
+<td>FLOAT</td>
+<td>Recomendación en litros</td>
+</tr>
+<tr>
+<td>precipitacion</td>
+<td>FLOAT</td>
+<td>Precipitación efectiva semanal</td>
+</tr>
+<tr>
+<td>temporada_id</td>
+<td>FK (opcional)</td>
+<td>Asociada a una temporada</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="recomendaciones">📈 <code>recomendaciones</code><a class="headerlink" href="#recomendaciones" title="Permanent link">&para;</a></h3>
+<p>Guarda las recomendaciones generadas para riego basadas en ETo, kc y precipitación.</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>zona_id</td>
+<td>FK</td>
+<td>Relación con la zona</td>
+</tr>
+<tr>
+<td>semana_inicio</td>
+<td>DATE</td>
+<td>Semana analizada</td>
+</tr>
+<tr>
+<td>semana_fin</td>
+<td>DATE</td>
+<td>Fin de semana</td>
+</tr>
+<tr>
+<td>etc</td>
+<td>FLOAT</td>
+<td>ETc calculada</td>
+</tr>
+<tr>
+<td>kc</td>
+<td>FLOAT</td>
+<td>Coeficiente utilizado</td>
+</tr>
+<tr>
+<td>precipitacion</td>
+<td>FLOAT</td>
+<td>Precipitación total</td>
+</tr>
+<tr>
+<td>riego_goteo</td>
+<td>FLOAT</td>
+<td>Recomendación en litros</td>
+</tr>
+<tr>
+<td>riego_pivote</td>
+<td>FLOAT</td>
+<td>Recomendación en litros</td>
+</tr>
+<tr>
+<td>riego_aspersor</td>
+<td>FLOAT</td>
+<td>Recomendación en litros</td>
+</tr>
+<tr>
+<td>creado_en</td>
+<td>TIMESTAMP</td>
+<td>Fecha de creación</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="consideraciones-de-seguridad">🔐 Consideraciones de Seguridad<a class="headerlink" href="#consideraciones-de-seguridad" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Las contraseñas se almacenan hasheadas.</li>
+<li>Acceso diferenciado por tipo de usuario (<code>tecnico</code>, <code>administrador</code>).</li>
+<li>Validaciones y filtros por zona y estado activo en el backend.</li>
+</ul>
+<hr />
+<h2 id="posibles-mejoras">🧪 Posibles Mejoras<a class="headerlink" href="#posibles-mejoras" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Historial de ejecuciones del crawler.</li>
+<li>Trazabilidad de cambios en <code>zonas</code> y <code>usuarios</code>.</li>
+<li>Registro de recomendaciones manuales vs automáticas.</li>
+</ul>
+<hr />
+<blockquote>
+<p>Esta base de datos está pensada para escalar fácilmente en nuevos módulos como sensores, pagos o auditorías.</p>
+</blockquote>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+    
+  </body>
+</html>
