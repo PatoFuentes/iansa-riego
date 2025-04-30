@@ -1,0 +1,24 @@
+site_name: Plataforma de Riego
+nav:
+  - Inicio: index.md
+  - Frontend: frontend.md
+  - Backend: backend.md
+  - Crawler: crawler.md
+  - Despliegue: deploy.md
+  - Base de Datos: database.md
+  - Guía de Uso: usage.md
+theme:
+  name: material
+  language: es
+  features:
+    - navigation.tabs
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true

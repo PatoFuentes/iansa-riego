@@ -31191,7 +31191,7 @@ frontend/node_modules/istanbul-reports/lib/html/index.js
 frontend/node_modules/istanbul-reports/lib/html/insertion-text.js
 frontend/node_modules/istanbul-reports/lib/html/assets/base.css
 frontend/node_modules/istanbul-reports/lib/html/assets/block-navigation.js
-frontend/node_modules/istanbul-reports/lib/html/assets/favicon.png
+frontend/node_modules/istanbul-reports/lib/html/assets/icono.iansa.webp
 frontend/node_modules/istanbul-reports/lib/html/assets/sort-arrow-sprite.png
 frontend/node_modules/istanbul-reports/lib/html/assets/sorter.js
 frontend/node_modules/istanbul-reports/lib/html/assets/vendor/prettify.css
@@ -31244,7 +31244,7 @@ frontend/node_modules/jackspeak/dist/esm/parse-args.js.map
 frontend/node_modules/jasmine-core/LICENSE
 frontend/node_modules/jasmine-core/package.json
 frontend/node_modules/jasmine-core/README.md
-frontend/node_modules/jasmine-core/images/jasmine_favicon.png
+frontend/node_modules/jasmine-core/images/jasmine_icono.iansa.webp
 frontend/node_modules/jasmine-core/images/jasmine-horizontal.png
 frontend/node_modules/jasmine-core/images/jasmine-horizontal.svg
 frontend/node_modules/jasmine-core/lib/jasmine-core.js
@@ -31749,7 +31749,7 @@ frontend/node_modules/karma-jasmine/lib/index.js
 frontend/node_modules/karma-jasmine/node_modules/jasmine-core/MIT.LICENSE
 frontend/node_modules/karma-jasmine/node_modules/jasmine-core/package.json
 frontend/node_modules/karma-jasmine/node_modules/jasmine-core/README.md
-frontend/node_modules/karma-jasmine/node_modules/jasmine-core/images/jasmine_favicon.png
+frontend/node_modules/karma-jasmine/node_modules/jasmine-core/images/jasmine_icono.iansa.webp
 frontend/node_modules/karma-jasmine/node_modules/jasmine-core/images/jasmine-horizontal.png
 frontend/node_modules/karma-jasmine/node_modules/jasmine-core/images/jasmine-horizontal.svg
 frontend/node_modules/karma-jasmine/node_modules/jasmine-core/lib/jasmine-core.js
