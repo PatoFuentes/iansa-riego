@@ -22,8 +22,12 @@ export class LoginComponent {
 
   login() {
     this.authService.login(this.correo, this.contrasenia).subscribe({
-      next: (usuario) => {
+      next: (response) => {
+        const { token, usuario } = response;
+
         this.authService.setUsuario(usuario);
+        this.authService.setToken(token);
+        
         this.toastr.success('Bienvenido ' + usuario.nombre);
         this.router.navigate(['']);
       },

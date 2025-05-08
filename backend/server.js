@@ -4,14 +4,19 @@ const mysql = require("mysql2");
 const cors = require("cors");
 const { obtenerDatosETo } = require("./crawlerINIA");
 const { obtenerClimaSemanal } = require("./crawlerINIA");
+const SALT_ROUNDS = 10;
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const authMiddleware = require("./authMiddleware");
 
 const app = express();
 app.use(cors());
 app.use(express.json()); // Permite recibir datos en formato JSON
+app.use(express.urlencoded({ extended: true }));
 
 // Configuración de la base de datos
 
-const dbHost = process.env.DB_HOST || '';
+const dbHost = process.env.DB_HOST || "";
 const dbConfig = process.env.DB_HOST.startsWith("/cloudsql")
   ? {
       user: process.env.DB_USER,
@@ -42,6 +47,9 @@ db.connect((err) => {
     });
   }
 });
+
+// Middleware para proteger rutas enteras
+app.use("/usuarios", authMiddleware);
 
 // Regiones
 
@@ -170,67 +178,83 @@ app.get("/usuarios/:rut", (req, res) => {
 });
 
 // Crear usuario
-app.post("/usuarios", (req, res) => {
+app.post("/usuarios", async (req, res) => {
   const { rut, nombre, telefono, correo, tipo, estado, contrasenia } = req.body;
+
   if (!rut || !nombre || !contrasenia) {
     return res.status(400).json({ error: "Faltan campos obligatorios" });
   }
-  const sql =
-    "INSERT INTO usuarios (rut, nombre, telefono, correo, tipo, estado, contrasenia ) VALUES (?, ?, ?, ?, ?, ?, ?)";
-  const values = [rut, nombre, telefono, correo, tipo, estado, contrasenia];
 
-  db.query(sql, values, (err, result) => {
-    if (err) {
-      console.error("Error al crear usuario:", err);
-      if (err.code === "ER_DUP_ENTRY") {
-        const campo = err.sqlMessage.includes("correo")
-          ? "correo electrónico"
-          : "RUT";
-        return res
-          .status(409)
-          .json({ error: `${campo} ya se encuentra registrado` });
+  try {
+    const hash = await bcrypt.hash(contrasenia, SALT_ROUNDS);
+    const sql = `
+      INSERT INTO usuarios (rut, nombre, telefono, correo, tipo, estado, contrasenia)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    const values = [rut, nombre, telefono, correo, tipo, estado, hash];
+
+    db.query(sql, values, (err, result) => {
+      if (err) {
+        console.error("Error al crear usuario:", err);
+        if (err.code === "ER_DUP_ENTRY") {
+          const campo = err.sqlMessage.includes("correo")
+            ? "correo electrónico"
+            : "RUT";
+          return res
+            .status(409)
+            .json({ error: `${campo} ya se encuentra registrado` });
+        }
+        return res.status(500).json({ error: "Error al crear usuario" });
       }
-      return res.status(500).json({ error: "Error al crear usuario" });
-    }
 
-    res.status(201).json({ message: "Usuario creado correctamente" });
-  });
+      res.status(201).json({ message: "Usuario creado correctamente" });
+    });
+  } catch (error) {
+    console.error("Error al hashear contraseña:", error);
+    return res.status(500).json({ error: "Error interno del servidor" });
+  }
 });
 
 // Editar usuario por rut
-app.put("/usuarios/:rut", (req, res) => {
+app.put("/usuarios/:rut", async (req, res) => {
   const { rut } = req.params;
   const { nombre, telefono, correo, tipo, estado, contrasenia } = req.body;
 
-  const sql = `
-    UPDATE usuarios SET nombre = ?, telefono = ?, correo = ?, tipo = ?, estado = ?, contrasenia = ? WHERE rut = ?
+  try {
+    const hash = await bcrypt.hash(contrasenia, SALT_ROUNDS);
+
+    const sql = `
+      UPDATE usuarios SET nombre = ?, telefono = ?, correo = ?, tipo = ?, estado = ?, contrasenia = ?
+      WHERE rut = ?
     `;
+    const values = [nombre, telefono, correo, tipo, estado, hash, rut];
 
-  const values = [nombre, telefono, correo, tipo, estado, contrasenia, rut];
-
-  db.query(sql, values, (err, result) => {
-    if (err) {
-      console.error("Error al editar usuario:", err);
-
-      // Manejo de duplicados (RUT o correo únicos)
-      if (err.code === "ER_DUP_ENTRY") {
-        const campo = err.sqlMessage.includes("correo")
-          ? "correo electrónico"
-          : "RUT";
+    db.query(sql, values, (err, result) => {
+      if (err) {
+        console.error("Error al editar usuario:", err);
+        if (err.code === "ER_DUP_ENTRY") {
+          const campo = err.sqlMessage.includes("correo")
+            ? "correo electrónico"
+            : "RUT";
+          return res
+            .status(409)
+            .json({ error: `${campo} ya se encuentra registrado` });
+        }
         return res
-          .status(409)
-          .json({ error: `${campo} ya se encuentra registrado` });
+          .status(500)
+          .json({ error: "Error al actualizar el usuario" });
       }
 
-      return res.status(500).json({ error: "Error al actualizar el usuario" });
-    }
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+      }
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "Usuario no encontrado" });
-    }
-
-    res.status(200).json({ message: "Usuario actualizado correctamente" });
-  });
+      res.status(200).json({ message: "Usuario actualizado correctamente" });
+    });
+  } catch (error) {
+    console.error("Error al hashear contraseña:", error);
+    return res.status(500).json({ error: "Error interno del servidor" });
+  }
 });
 
 // Desactivar usuario
@@ -266,26 +290,33 @@ app.put("/usuarios/:rut/activar", (req, res) => {
 // Login
 app.post("/login", (req, res) => {
   const { correo, contrasenia } = req.body;
-  const sql =
-    'SELECT * FROM usuarios WHERE correo = ? AND contrasenia = ? AND estado = "activo"';
 
-  db.query(sql, [correo, contrasenia], (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
+  db.query(
+    'SELECT * FROM usuarios WHERE correo = ? AND estado = "activo"',
+    [correo],
+    (err, results) => {
+      if (err) return res.status(500).json({ message: "Error interno" });
+      if (results.length === 0)
+        return res
+          .status(401)
+          .json({ message: "Usuario no encontrado o inactivo" });
 
-    if (results.length === 0) {
-      return res
-        .status(401)
-        .json({ error: "Credenciales inválidas o usuario inactivo" });
+      const usuario = results[0];
+
+      bcrypt.compare(contrasenia, usuario.contrasenia, (err, match) => {
+        if (!match)
+          return res.status(401).json({ message: "Contraseña incorrecta" });
+
+        const token = jwt.sign(
+          { rut: usuario.rut, tipo: usuario.tipo },
+          process.env.JWT_SECRET,
+          { expiresIn: "8h" }
+        );
+
+        res.json({ token, usuario });
+      });
     }
-
-    const usuario = results[0];
-    res.status(200).json({
-      rut: usuario.rut,
-      nombre: usuario.nombre,
-      correo: usuario.correo,
-      tipo: usuario.tipo,
-    });
-  });
+  );
 });
 
 // Zonas
@@ -299,7 +330,7 @@ app.get("/zonas", (req, res) => {
 });
 
 // Obtener zonas inactivas por región
-app.get("/zonas/inactivas/:region_id", (req, res) => {
+app.get("/zonas/inactivas/:region_id", authMiddleware, (req, res) => {
   const { region_id } = req.params;
   const sql = 'SELECT * FROM zonas WHERE estado = "inactivo" AND region_id = ?';
 
@@ -331,7 +362,7 @@ app.get("/zonas/:id", (req, res) => {
 });
 
 // Crear nueva zona
-app.post("/zonas", (req, res) => {
+app.post("/zonas", authMiddleware, (req, res) => {
   const {
     nombre,
     region_id,
@@ -370,7 +401,7 @@ app.post("/zonas", (req, res) => {
 });
 
 // Desactivar zona por ID
-app.put("/zonas/:id/desactivar", (req, res) => {
+app.put("/zonas/:id/desactivar", authMiddleware, (req, res) => {
   const { id } = req.params;
   const sql = 'UPDATE zonas SET estado = "inactivo" WHERE id = ?';
 
@@ -389,7 +420,7 @@ app.put("/zonas/:id/desactivar", (req, res) => {
 });
 
 // Reactivar zona por ID
-app.put("/zonas/:id/activar", (req, res) => {
+app.put("/zonas/:id/activar", authMiddleware, (req, res) => {
   const { id } = req.params;
   db.query(
     'UPDATE zonas SET estado = "activo" WHERE id = ?',
@@ -404,7 +435,7 @@ app.put("/zonas/:id/activar", (req, res) => {
 });
 
 // Editar zona por ID
-app.put("/zonas/:id", (req, res) => {
+app.put("/zonas/:id", authMiddleware, (req, res) => {
   const { id } = req.params;
   const {
     nombre,
@@ -734,7 +765,7 @@ app.post("/zonas/:id/clima-semanal", (req, res) => {
 // Endpoints Temporadas
 
 // Crear temporadas
-app.post("/temporadas", (req, res) => {
+app.post("/temporadas", authMiddleware, (req, res) => {
   const { nombre, fecha_inicio, fecha_fin } = req.body;
 
   if (!nombre || !fecha_inicio || !fecha_fin) {
@@ -782,7 +813,7 @@ app.get("/temporadas/activas", (req, res) => {
 });
 
 // Desactivar temporada
-app.put("/temporadas/:id/desactivar", (req, res) => {
+app.put("/temporadas/:id/desactivar", authMiddleware, (req, res) => {
   const { id } = req.params;
   const sql = 'UPDATE temporadas SET estado = "inactiva" WHERE id = ?';
 
@@ -801,7 +832,7 @@ app.put("/temporadas/:id/desactivar", (req, res) => {
 });
 
 // Activar temporada
-app.put("/temporadas/:id/activar", (req, res) => {
+app.put("/temporadas/:id/activar", authMiddleware, (req, res) => {
   const { id } = req.params;
   const sql = 'UPDATE temporadas SET estado = "activa" WHERE id = ?';
 

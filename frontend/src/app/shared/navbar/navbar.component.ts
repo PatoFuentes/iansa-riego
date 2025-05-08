@@ -49,8 +49,12 @@ export class NavbarComponent {
     const { correo, contrasenia } = this.loginData;
 
     this.authService.login(correo, contrasenia).subscribe({
-      next: (usuario) => {
+      next: (response) => {
+        const { token, usuario } = response;
+
         this.authService.setUsuario(usuario);
+        this.authService.setToken(token);
+
         this.toastr.success(`Bienvenido, ${usuario.nombre} 👋`);
         this.loginData = { correo: '', contrasenia: '' };
 
