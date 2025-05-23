@@ -9,10 +9,8 @@
       
       
       
-        <link rel="prev" href="../crawler/">
+        <link rel="prev" href="../usage/">
       
-      
-        <link rel="next" href="../database/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -20,7 +18,7 @@
     
     
       
-        <title>Despliegue - Plataforma de Riego</title>
+        <title>Configuración Técnica - Plataforma de Riego</title>
       
     
     
@@ -62,7 +60,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#despliegue-del-proyecto-en-google-cloud-platform-gcp" class="md-skip">
+        <a href="#documentacion-de-configuracion-del-proyecto" class="md-skip">
           Saltar a contenido
         </a>
       
@@ -96,7 +94,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Despliegue
+              Configuración Técnica
             
           </span>
         </div>
@@ -245,11 +243,9 @@
   
   
   
-    
   
-  
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="./" class="md-tabs__link">
+    <li class="md-tabs__item">
+      <a href="../deploy/" class="md-tabs__link">
         
   
   
@@ -304,9 +300,11 @@
   
   
   
+    
   
-    <li class="md-tabs__item">
-      <a href="../configuracion/" class="md-tabs__link">
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
         
   
   
@@ -444,32 +442,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    Despliegue
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../deploy/" class="md-nav__link">
         
   
   
@@ -480,122 +456,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Tabla de contenidos
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#servicios-utilizados-en-gcp" class="md-nav__link">
-    <span class="md-ellipsis">
-      🌐 Servicios Utilizados en GCP
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#estructura-del-despliegue" class="md-nav__link">
-    <span class="md-ellipsis">
-      🧱 Estructura del Despliegue
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#archivos-clave" class="md-nav__link">
-    <span class="md-ellipsis">
-      ⚙️ Archivos Clave
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="⚙️ Archivos Clave">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#cloudbuildyaml" class="md-nav__link">
-    <span class="md-ellipsis">
-      📁 cloudbuild.yaml
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#githubworkflowsdeployyaml" class="md-nav__link">
-    <span class="md-ellipsis">
-      📁 .github/workflows/deploy.yaml
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#secrets-en-github" class="md-nav__link">
-    <span class="md-ellipsis">
-      🔐 Secrets en GitHub
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configuraciones-relevantes" class="md-nav__link">
-    <span class="md-ellipsis">
-      ☁️ Configuraciones Relevantes
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#pruebas-automatizadas" class="md-nav__link">
-    <span class="md-ellipsis">
-      🧪 Pruebas Automatizadas
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#requisitos-previos" class="md-nav__link">
-    <span class="md-ellipsis">
-      ✅ Requisitos Previos
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#resultado" class="md-nav__link">
-    <span class="md-ellipsis">
-      📦 Resultado
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -648,10 +508,32 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../configuracion/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Configuración Técnica
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -662,6 +544,185 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#variables-de-entorno-env" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔧 Variables de Entorno (.env)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuracion-de-environmentts" class="md-nav__link">
+    <span class="md-ellipsis">
+      🌐 Configuración de environment.ts
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🌐 Configuración de environment.ts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#desarrollo-frontendenvironmentsenvironmentts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Desarrollo (frontend/environments/environment.ts)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#produccion-frontendenvironmentsenvironmentprodts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Producción (frontend/environments/environment.prod.ts)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      🐳 Docker
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🐳 Docker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backenddockerfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      /backend/Dockerfile
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#frontenddockerfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      /frontend/Dockerfile
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cloud-build-y-deploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔁 Cloud Build y Deploy
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔁 Cloud Build y Deploy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cloudbuildyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      /cloudbuild.yaml
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubworkflowsdeployyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      .github/workflows/deploy.yaml
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#seguridad-y-jwt" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔐 Seguridad y JWT
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔐 Seguridad y JWT">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#middleware-backendauthmiddlewarejs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Middleware (backend/authMiddleware.js)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#token-desde-backend-login" class="md-nav__link">
+    <span class="md-ellipsis">
+      Token desde backend (/login)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dominio-y-vps-gcp" class="md-nav__link">
+    <span class="md-ellipsis">
+      🌍 Dominio y VPS / GCP
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#otros-archivos-importantes" class="md-nav__link">
+    <span class="md-ellipsis">
+      📁 Otros Archivos Importantes
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -693,46 +754,37 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#servicios-utilizados-en-gcp" class="md-nav__link">
+  <a href="#variables-de-entorno-env" class="md-nav__link">
     <span class="md-ellipsis">
-      🌐 Servicios Utilizados en GCP
+      🔧 Variables de Entorno (.env)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#estructura-del-despliegue" class="md-nav__link">
+  <a href="#configuracion-de-environmentts" class="md-nav__link">
     <span class="md-ellipsis">
-      🧱 Estructura del Despliegue
+      🌐 Configuración de environment.ts
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#archivos-clave" class="md-nav__link">
-    <span class="md-ellipsis">
-      ⚙️ Archivos Clave
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="⚙️ Archivos Clave">
+    <nav class="md-nav" aria-label="🌐 Configuración de environment.ts">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#cloudbuildyaml" class="md-nav__link">
+  <a href="#desarrollo-frontendenvironmentsenvironmentts" class="md-nav__link">
     <span class="md-ellipsis">
-      📁 cloudbuild.yaml
+      Desarrollo (frontend/environments/environment.ts)
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#githubworkflowsdeployyaml" class="md-nav__link">
+  <a href="#produccion-frontendenvironmentsenvironmentprodts" class="md-nav__link">
     <span class="md-ellipsis">
-      📁 .github/workflows/deploy.yaml
+      Producción (frontend/environments/environment.prod.ts)
     </span>
   </a>
   
@@ -744,45 +796,117 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#secrets-en-github" class="md-nav__link">
+  <a href="#docker" class="md-nav__link">
     <span class="md-ellipsis">
-      🔐 Secrets en GitHub
+      🐳 Docker
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🐳 Docker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#backenddockerfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      /backend/Dockerfile
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#frontenddockerfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      /frontend/Dockerfile
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cloud-build-y-deploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔁 Cloud Build y Deploy
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔁 Cloud Build y Deploy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cloudbuildyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      /cloudbuild.yaml
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubworkflowsdeployyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      .github/workflows/deploy.yaml
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#seguridad-y-jwt" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔐 Seguridad y JWT
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔐 Seguridad y JWT">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#middleware-backendauthmiddlewarejs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Middleware (backend/authMiddleware.js)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#token-desde-backend-login" class="md-nav__link">
+    <span class="md-ellipsis">
+      Token desde backend (/login)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dominio-y-vps-gcp" class="md-nav__link">
+    <span class="md-ellipsis">
+      🌍 Dominio y VPS / GCP
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuraciones-relevantes" class="md-nav__link">
+  <a href="#otros-archivos-importantes" class="md-nav__link">
     <span class="md-ellipsis">
-      ☁️ Configuraciones Relevantes
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#pruebas-automatizadas" class="md-nav__link">
-    <span class="md-ellipsis">
-      🧪 Pruebas Automatizadas
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#requisitos-previos" class="md-nav__link">
-    <span class="md-ellipsis">
-      ✅ Requisitos Previos
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#resultado" class="md-nav__link">
-    <span class="md-ellipsis">
-      📦 Resultado
+      📁 Otros Archivos Importantes
     </span>
   </a>
   
@@ -804,144 +928,95 @@
 
 
 
-<h1 id="despliegue-del-proyecto-en-google-cloud-platform-gcp">🚀 Despliegue del Proyecto en Google Cloud Platform (GCP)<a class="headerlink" href="#despliegue-del-proyecto-en-google-cloud-platform-gcp" title="Permanent link">&para;</a></h1>
-<p>Esta sección describe el proceso de despliegue automático del sistema de riego usando Docker, GitHub Actions y Google Cloud Platform, específicamente con Cloud Run.</p>
+<h1 id="documentacion-de-configuracion-del-proyecto">⚙️ Documentación de Configuración del Proyecto<a class="headerlink" href="#documentacion-de-configuracion-del-proyecto" title="Permanent link">&para;</a></h1>
+<p>Esta sección detalla la configuración necesaria para el correcto funcionamiento y despliegue del sistema de riego desarrollado con Angular y Node.js.</p>
 <hr />
-<h2 id="servicios-utilizados-en-gcp">🌐 Servicios Utilizados en GCP<a class="headerlink" href="#servicios-utilizados-en-gcp" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Servicio</th>
-<th>Uso principal</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Cloud Run</td>
-<td>Hospedaje de contenedores para frontend/backend</td>
-</tr>
-<tr>
-<td>Cloud Build</td>
-<td>Automatiza los builds de Docker</td>
-</tr>
-<tr>
-<td>Cloud SQL</td>
-<td>Base de datos MySQL</td>
-</tr>
-<tr>
-<td>Artifact Registry</td>
-<td>Almacén de imágenes Docker</td>
-</tr>
-<tr>
-<td>IAM</td>
-<td>Permisos y cuentas de servicio</td>
-</tr>
-<tr>
-<td>Cloud Logging</td>
-<td>Logs de ejecución de los servicios</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="estructura-del-despliegue">🧱 Estructura del Despliegue<a class="headerlink" href="#estructura-del-despliegue" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span><code>.github/workflows/
-├──<span class="w"> </span>deploy.yaml<span class="w">       </span><span class="c1"># CI/CD para build + deploy</span>
-├──<span class="w"> </span>test.yaml<span class="w">         </span><span class="c1"># Lint y pruebas automáticas</span>
+<h2 id="variables-de-entorno-env">🔧 Variables de Entorno (<code>.env</code>)<a class="headerlink" href="#variables-de-entorno-env" title="Permanent link">&para;</a></h2>
+<p>Ubicación: <code>/backend/.env</code></p>
+<div class="codehilite"><pre><span></span><code>DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=*****
+DB_NAME=iansa_riego
+PORT=3000
+JWT_SECRET=mi_clave_secreta_segura
+</code></pre></div>
 
-cloudbuild.yaml<span class="w">        </span><span class="c1"># Build y despliegue en Cloud Run</span>
-frontend/Dockerfile<span class="w">    </span><span class="c1"># Imagen frontend Angular</span>
-backend/Dockerfile<span class="w">     </span><span class="c1"># Imagen backend Express</span>
+<blockquote>
+<p>⚠️ Nunca subir este archivo a GitHub. Está en <code>.gitignore</code>.</p>
+</blockquote>
+<hr />
+<h2 id="configuracion-de-environmentts">🌐 Configuración de <code>environment.ts</code><a class="headerlink" href="#configuracion-de-environmentts" title="Permanent link">&para;</a></h2>
+<h3 id="desarrollo-frontendenvironmentsenvironmentts">Desarrollo (<code>frontend/environments/environment.ts</code>)<a class="headerlink" href="#desarrollo-frontendenvironmentsenvironmentts" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><code><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">environment</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">production</span><span class="o">:</span><span class="w"> </span><span class="kt">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">apiUrl</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;http://localhost:3000&#39;</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<h3 id="produccion-frontendenvironmentsenvironmentprodts">Producción (<code>frontend/environments/environment.prod.ts</code>)<a class="headerlink" href="#produccion-frontendenvironmentsenvironmentprodts" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><code><span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">environment</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">production</span><span class="o">:</span><span class="w"> </span><span class="kt">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">apiUrl</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;https://backend-riego-XXXXXX.a.run.app&#39;</span>
+<span class="p">};</span>
 </code></pre></div>
 
 <hr />
-<h2 id="archivos-clave">⚙️ Archivos Clave<a class="headerlink" href="#archivos-clave" title="Permanent link">&para;</a></h2>
-<h3 id="cloudbuildyaml">📁 <code>cloudbuild.yaml</code><a class="headerlink" href="#cloudbuildyaml" title="Permanent link">&para;</a></h3>
-<p>Define los pasos para:</p>
+<h2 id="docker">🐳 Docker<a class="headerlink" href="#docker" title="Permanent link">&para;</a></h2>
+<h3 id="backenddockerfile"><code>/backend/Dockerfile</code><a class="headerlink" href="#backenddockerfile" title="Permanent link">&para;</a></h3>
+<p>Define el backend Node.js con instalación de dependencias y configuración Express.</p>
+<h3 id="frontenddockerfile"><code>/frontend/Dockerfile</code><a class="headerlink" href="#frontenddockerfile" title="Permanent link">&para;</a></h3>
+<p>Build de Angular y configuración con NGINX:</p>
+<div class="codehilite"><pre><span></span><code><span class="k">FROM</span><span class="w"> </span><span class="s">node:22</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">build</span>
+<span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
+<span class="k">COPY</span><span class="w"> </span>.<span class="w"> </span>.
+<span class="k">RUN</span><span class="w"> </span>npm<span class="w"> </span>install
+<span class="k">RUN</span><span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>build<span class="w"> </span>--<span class="w"> </span>--configuration<span class="w"> </span>production<span class="w"> </span>--base-href<span class="w"> </span>/
+
+<span class="k">FROM</span><span class="w"> </span><span class="s">nginx:alpine</span>
+<span class="k">COPY</span><span class="w"> </span>--from<span class="o">=</span>build<span class="w"> </span>/app/dist/frontend-riego<span class="w"> </span>/usr/share/nginx/html
+<span class="k">COPY</span><span class="w"> </span>nginx.conf<span class="w"> </span>/etc/nginx/nginx.conf
+</code></pre></div>
+
+<hr />
+<h2 id="cloud-build-y-deploy">🔁 Cloud Build y Deploy<a class="headerlink" href="#cloud-build-y-deploy" title="Permanent link">&para;</a></h2>
+<h3 id="cloudbuildyaml"><code>/cloudbuild.yaml</code><a class="headerlink" href="#cloudbuildyaml" title="Permanent link">&para;</a></h3>
+<p>Ejecuta:
+- Build de frontend y backend
+- Push a Container Registry
+- Deploy a Cloud Run</p>
+<h3 id="githubworkflowsdeployyaml"><code>.github/workflows/deploy.yaml</code><a class="headerlink" href="#githubworkflowsdeployyaml" title="Permanent link">&para;</a></h3>
+<p>CI/CD automático para <code>main</code>:
+- Test
+- Build
+- Deploy</p>
+<hr />
+<h2 id="seguridad-y-jwt">🔐 Seguridad y JWT<a class="headerlink" href="#seguridad-y-jwt" title="Permanent link">&para;</a></h2>
+<h3 id="middleware-backendauthmiddlewarejs">Middleware (<code>backend/authMiddleware.js</code>)<a class="headerlink" href="#middleware-backendauthmiddlewarejs" title="Permanent link">&para;</a></h3>
+<p>Protege endpoints usando token JWT.</p>
+<h3 id="token-desde-backend-login">Token desde backend (<code>/login</code>)<a class="headerlink" href="#token-desde-backend-login" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">jwt</span><span class="p">.</span><span class="nx">sign</span><span class="p">({</span><span class="w"> </span><span class="nx">rut</span><span class="o">:</span><span class="w"> </span><span class="nx">usuario</span><span class="p">.</span><span class="nx">rut</span><span class="p">,</span><span class="w"> </span><span class="nx">tipo</span><span class="o">:</span><span class="w"> </span><span class="nx">usuario</span><span class="p">.</span><span class="nx">tipo</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">JWT_SECRET</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">expiresIn</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;8h&quot;</span><span class="w"> </span><span class="p">});</span>
+</code></pre></div>
+
+<hr />
+<h2 id="dominio-y-vps-gcp">🌍 Dominio y VPS / GCP<a class="headerlink" href="#dominio-y-vps-gcp" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Build backend y frontend (Docker)</li>
-<li>Push a Artifact Registry</li>
-<li>Deploy en Cloud Run</li>
-</ul>
-<div class="codehilite"><pre><span></span><code><span class="nt">steps</span><span class="p">:</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;gcr.io/cloud-builders/docker&#39;</span>
-<span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;build&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;-t&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;gcr.io/PROYECTO/backend-riego&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;.&#39;</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="nt">dir</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;backend&#39;</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;gcr.io/cloud-builders/docker&#39;</span>
-<span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;build&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;-t&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;gcr.io/PROYECTO/frontend-riego&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;.&#39;</span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="nt">dir</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;frontend&#39;</span>
-<span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">...</span>
-</code></pre></div>
-
-<h3 id="githubworkflowsdeployyaml">📁 <code>.github/workflows/deploy.yaml</code><a class="headerlink" href="#githubworkflowsdeployyaml" title="Permanent link">&para;</a></h3>
-<p>Se ejecuta en cada <code>push</code> a <code>main</code>. Autentica con GCP y lanza <code>cloudbuild.yaml</code>.</p>
-<div class="codehilite"><pre><span></span><code><span class="nt">on</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">push</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">branches</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">main</span>
-</code></pre></div>
-
-<hr />
-<h2 id="secrets-en-github">🔐 Secrets en GitHub<a class="headerlink" href="#secrets-en-github" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Nombre</th>
-<th>Descripción</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>GCP_SA_KEY</code></td>
-<td>JSON de la cuenta de servicio con permisos a Cloud Run, Build y Storage</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="configuraciones-relevantes">☁️ Configuraciones Relevantes<a class="headerlink" href="#configuraciones-relevantes" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Cada microservicio (frontend y backend) tiene su propia imagen Docker.</li>
-<li>El backend escucha en <code>PORT=3000</code>, pero Cloud Run lo redirige a <code>8080</code>.</li>
-<li>Las variables de entorno del backend se configuran directamente en la consola de Cloud Run.</li>
+<li>Configurar <code>hostname</code> con dominio (ej. <code>www.iansa-riego.cl</code>)</li>
+<li>Vincular DNS al backend y frontend</li>
+<li>Asegurar puertos abiertos 80 y 443</li>
+<li>Activar SSL Let’s Encrypt o certbot</li>
 </ul>
 <hr />
-<h2 id="pruebas-automatizadas">🧪 Pruebas Automatizadas<a class="headerlink" href="#pruebas-automatizadas" title="Permanent link">&para;</a></h2>
-<p>Se ejecutan antes del despliegue en el workflow <code>test.yaml</code>:</p>
-<div class="codehilite"><pre><span></span><code><span class="nt">on</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">push</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">branches</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">main</span>
-<span class="w">  </span><span class="nt">pull_request</span><span class="p">:</span>
-</code></pre></div>
-
-<hr />
-<h2 id="requisitos-previos">✅ Requisitos Previos<a class="headerlink" href="#requisitos-previos" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Activar APIs en GCP:</li>
-<li>Cloud Run</li>
-<li>Cloud Build</li>
-<li>Artifact Registry</li>
-<li>
-<p>Cloud SQL Admin</p>
-</li>
-<li>
-<p>Crear cuenta de servicio y otorgar permisos:</p>
-</li>
-<li>Cloud Run Admin</li>
-<li>Cloud Build Editor</li>
-<li>
-<p>Storage Admin (para logs y fuentes)</p>
-</li>
-<li>
-<p>Agregar JSON de cuenta como secret en GitHub.</p>
-</li>
-</ol>
-<hr />
-<h2 id="resultado">📦 Resultado<a class="headerlink" href="#resultado" title="Permanent link">&para;</a></h2>
+<h2 id="otros-archivos-importantes">📁 Otros Archivos Importantes<a class="headerlink" href="#otros-archivos-importantes" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Producción disponible en:</li>
-<li>Frontend: <code>https://frontend-riego-xxx.run.app</code></li>
-<li>Backend: <code>https://backend-riego-xxx.run.app</code></li>
+<li><code>angular.json</code>: configuración build Angular</li>
+<li><code>mkdocs.yml</code>: documentación del sistema</li>
+<li><code>tsconfig.json</code>: compilador TypeScript</li>
+<li><code>.gitignore</code>: excluye <code>.env</code>, <code>node_modules</code>, <code>dist/</code>, etc.</li>
 </ul>
+<hr />
+<blockquote>
+<p>✅ Esta documentación ayuda a replicar y mantener la configuración del sistema en cualquier entorno.</p>
+</blockquote>
 
 
 
