@@ -7,6 +7,7 @@ nav:
   - Despliegue: deploy.md
   - Base de Datos: database.md
   - Guía de Uso: usage.md
+  - Configuración Técnica: configuracion.md
 theme:
   name: material
   language: es
