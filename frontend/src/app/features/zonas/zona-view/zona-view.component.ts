@@ -637,6 +637,11 @@ export class ZonaViewComponent implements OnInit {
         (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
       );
 
+    if (datos.length === 0) {
+      this.chartData = { labels: [], datasets: [] };
+      return; // evita errores por arreglo vacío
+    }
+
     const labels = datos.map((d) =>
       new Date(d.fecha).toLocaleDateString('es-CL')
     );
