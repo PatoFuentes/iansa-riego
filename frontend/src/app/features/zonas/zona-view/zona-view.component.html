@@ -200,6 +200,19 @@
       <button class="btn btn-outline-success mb-3" (click)="descargarGrafico()">
         Descargar Gráfico
       </button>
+      <div class="mb-3" *ngIf="temporadas.length > 0">
+        <label class="form-label">Comparar temporadas</label>
+        <select
+          class="form-select"
+          multiple
+          [(ngModel)]="temporadasCompararIds"
+          (change)="actualizarGraficoGradosDia()"
+        >
+          <option *ngFor="let temp of temporadas" [ngValue]="temp.id">
+            {{ temp.nombre }}
+          </option>
+        </select>
+      </div>
       <canvas
         #graficoCanvas
         baseChart
