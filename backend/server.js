@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 // Configuración de la base de datos
 
 const dbHost = process.env.DB_HOST || "";
-const dbConfig = process.env.DB_HOST.startsWith("/cloudsql")
+const dbConfig = dbHost.startsWith("/cloudsql")
   ? {
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
@@ -575,8 +575,8 @@ app.post("/zonas/:id/consumo-agua", (req, res) => {
 });
 
 // Editar consumo de agua por ID
-app.put("/zonas/:id/consumo-agua/:id", (req, res) => {
-  const { id } = req.params;
+app.put("/zonas/:zonaId/consumo-agua/:id", (req, res) => {
+  const { zonaId, id } = req.params;
   const {
     semana_inicio,
     semana_fin,
@@ -596,7 +596,7 @@ app.put("/zonas/:id/consumo-agua/:id", (req, res) => {
         semana_inicio = ?, semana_fin = ?, eto = ?, precipitacion = ?, kc = ?, etc = ?,
         consumo_pivote = ?, consumo_cobertura = ?, consumo_carrete = ?, consumo_aspersor = ?,
         id_temporada = ?
-        WHERE id = ?
+        WHERE id = ? AND id_zona = ?
     `;
 
   db.query(
@@ -614,6 +614,7 @@ app.put("/zonas/:id/consumo-agua/:id", (req, res) => {
       redondearEntero(consumo_aspersor),
       id_temporada,
       id,
+      zonaId,
     ],
     (err, result) => {
       if (err) {
@@ -631,12 +632,12 @@ app.put("/zonas/:id/consumo-agua/:id", (req, res) => {
 });
 
 // Eliminar consumo de agua por ID
-app.delete("/zonas/:id/consumo-agua/:id", (req, res) => {
-  const { id } = req.params;
+app.delete("/zonas/:zonaId/consumo-agua/:id", (req, res) => {
+  const { zonaId, id } = req.params;
 
-  const sql = "DELETE FROM consumo_agua WHERE id = ?";
+  const sql = "DELETE FROM consumo_agua WHERE id = ? AND id_zona = ?";
 
-  db.query(sql, [id], (err, result) => {
+  db.query(sql, [id, zonaId], (err, result) => {
     if (err) {
       console.error("❌ Error al eliminar consumo de agua:", err);
       return res
