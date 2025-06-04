@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 // Configuración de la base de datos
 
 const dbHost = process.env.DB_HOST || "";
-const dbConfig = process.env.DB_HOST.startsWith("/cloudsql")
+const dbConfig = dbHost.startsWith("/cloudsql")
   ? {
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
@@ -521,8 +521,8 @@ function redondearEntero(valor) {
   return Math.round(valor);
 }
 // Registrar consumo de agua en una zona
-app.post("/zonas/:id/consumo-agua", (req, res) => {
-  const { id } = req.params;
+app.post("/zonas/:zonaId/consumo-agua", (req, res) => {
+  const { zonaId } = req.params;
   const {
     semana_inicio,
     semana_fin,
@@ -545,7 +545,7 @@ app.post("/zonas/:id/consumo-agua", (req, res) => {
   db.query(
     sql,
     [
-      id,
+      zonaId,
       semana_inicio,
       semana_fin,
       redondearEntero(eto),
@@ -575,8 +575,8 @@ app.post("/zonas/:id/consumo-agua", (req, res) => {
 });
 
 // Editar consumo de agua por ID
-app.put("/zonas/:id/consumo-agua/:id", (req, res) => {
-  const { id } = req.params;
+app.put("/zonas/:zonaId/consumo-agua/:consumoId", (req, res) => {
+  const { zonaId, consumoId } = req.params;
   const {
     semana_inicio,
     semana_fin,
@@ -613,7 +613,7 @@ app.put("/zonas/:id/consumo-agua/:id", (req, res) => {
       redondearEntero(consumo_carrete),
       redondearEntero(consumo_aspersor),
       id_temporada,
-      id,
+      consumoId,
     ],
     (err, result) => {
       if (err) {
@@ -631,12 +631,12 @@ app.put("/zonas/:id/consumo-agua/:id", (req, res) => {
 });
 
 // Eliminar consumo de agua por ID
-app.delete("/zonas/:id/consumo-agua/:id", (req, res) => {
-  const { id } = req.params;
+app.delete("/zonas/:zonaId/consumo-agua/:consumoId", (req, res) => {
+  const { zonaId, consumoId } = req.params;
 
   const sql = "DELETE FROM consumo_agua WHERE id = ?";
 
-  db.query(sql, [id], (err, result) => {
+  db.query(sql, [consumoId], (err, result) => {
     if (err) {
       console.error("❌ Error al eliminar consumo de agua:", err);
       return res
