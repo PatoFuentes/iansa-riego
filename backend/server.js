@@ -650,6 +650,24 @@ app.delete("/zonas/:zonaId/consumo-agua/:consumoId", (req, res) => {
   });
 });
 
+// Obtener datos de eto y consumo diario por zona
+app.get("/zonas/:zonaId/eto-consumo-dia", (req, res) => {
+  const { zonaId } = req.params;
+  const sql =
+    "SELECT * FROM eto_consumo_dia WHERE id_zona = ? ORDER BY fecha ASC";
+
+  db.query(sql, [zonaId], (err, results) => {
+    if (err) {
+      console.error("Error al obtener datos eto_consumo_dia:", err);
+      return res
+        .status(500)
+        .json({ error: "Error al obtener datos eto_consumo_dia" });
+    }
+
+    res.json(results);
+  });
+});
+
 // Obtener datos climaticos por zona
 app.get("/zonas/:zonaId/clima-semanal", (req, res) => {
   const { zonaId } = req.params;

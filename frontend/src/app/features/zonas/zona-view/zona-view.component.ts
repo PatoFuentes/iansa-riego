@@ -11,6 +11,7 @@ import { ToastrService, ToastrModule } from 'ngx-toastr';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ClimaZona } from '../../../core/models/clima.model';
+import { EtoConsumoDia } from '../../../core/models/eto-consumo-dia.model';
 import { TemporadasService } from '../../../core/services/temporadas.service';
 import { Temporada } from '../../../core/models/temporada.model';
 import Swal from 'sweetalert2';
@@ -22,6 +23,13 @@ import annotationPlugin from 'chartjs-plugin-annotation';
 import { CrawlerService } from '../../../core/services/crawler.service';
 
 declare var bootstrap: any;
+
+// 🎨 Colores fijos para cada temporada. Ajusta los nombres según tu base de datos
+const TEMPORADA_COLORS: Record<string, string> = {
+  '2022-2023': '#1abc9c',
+  '2023-2024': '#3498db',
+  '2024-2025': '#8e44ad',
+};
 
 @Component({
   selector: 'app-zona-view',
@@ -90,6 +98,15 @@ export class ZonaViewComponent implements OnInit {
     { fecha: '', temp_min: 0, temp_max: 0, temp_promedio: 0, precipitacion: 0 },
   ];
 
+  // Datos para gráfico comparativo de ETo y consumos diarios
+  etoConsumoDia: EtoConsumoDia[] = [];
+  variableSeleccionada: string = 'eto';
+  temporadasVisibles: Record<number, boolean> = {};
+  temporadaColores: Record<number, string> = {};
+  chartEtoData: ChartData<'line'> = { labels: [], datasets: [] };
+  chartEtoOptions: any;
+  mostrarGraficoEto: boolean = false;
+
   constructor(
     private route: ActivatedRoute,
     private zonasService: ZonasService,
@@ -111,8 +128,12 @@ export class ZonaViewComponent implements OnInit {
           this.zona = data;
           this.obtenerConsumoAgua();
           this.obtenerClima();
+          this.obtenerEtoConsumoDia();
           this.temporadasService.getTemporadasActivas().subscribe({
-            next: (data) => (this.temporadas = data),
+            next: (data) => {
+              this.temporadas = data.sort((a, b) => a.nombre.localeCompare(b.nombre));
+              this.actualizarGraficoEtoConsumo();
+            },
             error: () => this.toastr.error('Error al cargar temporadas'),
           });
         },
@@ -819,5 +840,93 @@ export class ZonaViewComponent implements OnInit {
       .toISOString()
       .slice(0, 10)}.png`;
     link.click();
+  }
+
+  obtenerEtoConsumoDia(): void {
+    if (!this.zona?.id) return;
+
+    this.zonasService.getEtoConsumoDia(this.zona.id).subscribe({
+      next: (data) => {
+        this.etoConsumoDia = data.sort(
+          (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
+        );
+        const ids = Array.from(new Set(this.etoConsumoDia.map((d) => d.id_temporada)));
+        ids.forEach((id) => {
+          if (this.temporadasVisibles[id] === undefined) this.temporadasVisibles[id] = true;
+        });
+        this.actualizarGraficoEtoConsumo();
+      },
+      error: (err) => console.error('Error al obtener eto_consumo_dia:', err),
+    });
+  }
+
+  actualizarGraficoEtoConsumo(): void {
+    if (!this.etoConsumoDia.length || !this.temporadas.length) {
+      this.chartEtoData = { labels: [], datasets: [] };
+      return;
+    }
+
+    const variable = this.variableSeleccionada;
+    const labelsSet = new Set<string>();
+    this.etoConsumoDia.forEach((d) => labelsSet.add(d.fecha.slice(5, 10)));
+    const labels = Array.from(labelsSet).sort();
+
+    const colores = ['#3e95cd', '#156082', '#e97132', '#196b24', '#c45850', '#ff6384'];
+    const datasets: any[] = [];
+    let idx = 0;
+
+    // Asignar colores a cada temporada si aún no tienen
+    this.temporadas.forEach((temp) => {
+      if (!this.temporadaColores[temp.id!]) {
+        this.temporadaColores[temp.id!] =
+          TEMPORADA_COLORS[temp.nombre] || colores[idx % colores.length];
+        idx++;
+      }
+    });
+    idx = 0;
+
+    this.temporadas.forEach((temp) => {
+      const datosTemp = this.etoConsumoDia
+        .filter((d) => d.id_temporada === temp.id)
+        .map((d) => ({ dia: d.fecha.slice(5, 10), valor: (d as any)[variable] }));
+      if (datosTemp.length === 0) return;
+
+      const data: number[] = [];
+      let acc = 0;
+      labels.forEach((lab) => {
+        const encontrado = datosTemp.find((e) => e.dia === lab);
+        if (encontrado) acc += Number(encontrado.valor);
+        data.push(acc);
+      });
+
+      const color = this.temporadaColores[temp.id!];
+      datasets.push({
+        data,
+        label: temp.nombre,
+        borderColor: color,
+        backgroundColor: color + '33',
+        pointBackgroundColor: color,
+        pointBorderColor: color,
+        fill: false,
+        hidden: this.temporadasVisibles[temp.id!] === false,
+      });
+      idx++;
+    });
+
+    this.chartEtoOptions = {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: true,
+          labels: { usePointStyle: true },
+        },
+      },
+      scales: {
+        y: { title: { display: true, text: 'mm acumulados' } },
+        x: { title: { display: true, text: 'Día (MM-DD)' } },
+      },
+    };
+
+    this.chartEtoData = { labels, datasets };
   }
 }
