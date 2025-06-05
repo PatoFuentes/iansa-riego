@@ -888,7 +888,7 @@ export class ZonaViewComponent implements OnInit {
         borderColor: color,
         backgroundColor: color + '33',
         fill: false,
-        hidden: this.temporadasVisibles[temp.id] === false,
+        hidden: this.temporadasVisibles[temp.id!] === false,
       });
       idx++;
     });

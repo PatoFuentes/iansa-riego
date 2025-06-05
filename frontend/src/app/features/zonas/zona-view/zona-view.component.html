@@ -247,7 +247,7 @@
                 class="form-check-input"
                 type="checkbox"
                 [id]="'temp' + temp.id"
-                [(ngModel)]="temporadasVisibles[temp.id]"
+                [(ngModel)]="temporadasVisibles[temp.id!]"
                 (change)="actualizarGraficoEtoConsumo()"
               />
               <label class="form-check-label" [for]="'temp' + temp.id">
