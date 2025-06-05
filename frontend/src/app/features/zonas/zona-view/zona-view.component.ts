@@ -95,6 +95,7 @@ export class ZonaViewComponent implements OnInit {
   etoConsumoDia: EtoConsumoDia[] = [];
   variableSeleccionada: string = 'eto';
   temporadasVisibles: Record<number, boolean> = {};
+  temporadaColores: Record<number, string> = {};
   chartEtoData: ChartData<'line'> = { labels: [], datasets: [] };
   chartEtoOptions: any;
   mostrarGraficoEto: boolean = false;
@@ -867,6 +868,15 @@ export class ZonaViewComponent implements OnInit {
     const datasets: any[] = [];
     let idx = 0;
 
+    // Asignar colores a cada temporada si aún no tienen
+    this.temporadas.forEach((temp) => {
+      if (!this.temporadaColores[temp.id!]) {
+        this.temporadaColores[temp.id!] = colores[idx % colores.length];
+        idx++;
+      }
+    });
+    idx = 0;
+
     this.temporadas.forEach((temp) => {
       const datosTemp = this.etoConsumoDia
         .filter((d) => d.id_temporada === temp.id)
@@ -881,7 +891,7 @@ export class ZonaViewComponent implements OnInit {
         data.push(acc);
       });
 
-      const color = colores[idx % colores.length];
+      const color = this.temporadaColores[temp.id!];
       datasets.push({
         data,
         label: temp.nombre,
