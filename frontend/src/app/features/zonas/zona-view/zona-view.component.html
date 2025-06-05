@@ -248,10 +248,6 @@
                 type="checkbox"
                 [id]="'temp' + temp.id!"
                 [(ngModel)]="temporadasVisibles[temp.id!]"
-                class="form-check-label"
-                [for]="'temp' + temp.id!"
-                [style.color]="temporadaColores[temp.id!]"
-              >
                 (change)="actualizarGraficoEtoConsumo()"
               />
               <label class="form-check-label" [for]="'temp' + temp.id">

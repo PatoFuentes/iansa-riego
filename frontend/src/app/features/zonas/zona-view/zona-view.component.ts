@@ -131,7 +131,7 @@ export class ZonaViewComponent implements OnInit {
           this.obtenerEtoConsumoDia();
           this.temporadasService.getTemporadasActivas().subscribe({
             next: (data) => {
-              this.temporadas = data;
+              this.temporadas = data.sort((a, b) => a.nombre.localeCompare(b.nombre));
               this.actualizarGraficoEtoConsumo();
             },
             error: () => this.toastr.error('Error al cargar temporadas'),
@@ -871,7 +871,7 @@ export class ZonaViewComponent implements OnInit {
     this.etoConsumoDia.forEach((d) => labelsSet.add(d.fecha.slice(5, 10)));
     const labels = Array.from(labelsSet).sort();
 
-    const colores = ['#3e95cd', '#8e5ea2', '#3cba9f', '#e8c3b9', '#c45850', '#ff6384'];
+    const colores = ['#3e95cd', '#156082', '#e97132', '#196b24', '#c45850', '#ff6384'];
     const datasets: any[] = [];
     let idx = 0;
 
