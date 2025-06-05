@@ -209,6 +209,63 @@
       ></canvas>
     </div>
   </div>
+
+  <!-- 📊 Sección: Comparar Consumos Diarios -->
+  <div class="card shadow-sm border-dark mb-4">
+    <div
+      class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+      style="cursor: pointer"
+      (click)="mostrarGraficoEto = !mostrarGraficoEto"
+    >
+      <h5 class="mb-0">Comparación Diario por Temporada 📊</h5>
+      <i
+        class="fas"
+        [ngClass]="mostrarGraficoEto ? 'fa-chevron-up' : 'fa-chevron-down'"
+      ></i>
+    </div>
+    <div class="card-body" *ngIf="mostrarGraficoEto">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Variable</label>
+          <select
+            class="form-select"
+            [(ngModel)]="variableSeleccionada"
+            (change)="actualizarGraficoEtoConsumo()"
+          >
+            <option value="eto">ETo (mm)</option>
+            <option value="consumo_pivote">Pivote (mm)</option>
+            <option value="consumo_cobertura">Cobertura (mm)</option>
+            <option value="consumo_carrete">Carrete (mm)</option>
+            <option value="consumo_aspersor">Aspersión (mm)</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Temporadas</label>
+          <div *ngFor="let temp of temporadas">
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [id]="'temp' + temp.id"
+                [(ngModel)]="temporadasVisibles[temp.id]"
+                (change)="actualizarGraficoEtoConsumo()"
+              />
+              <label class="form-check-label" [for]="'temp' + temp.id">
+                {{ temp.nombre }}
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <canvas
+        baseChart
+        #graficoEtoCanvas
+        [data]="chartEtoData"
+        [options]="chartEtoOptions"
+        [type]="'line'"
+      ></canvas>
+    </div>
+  </div>
 </main>
 
 <!-- 🔄 Modal combinado: Previsualizar y editar Recomendación -->

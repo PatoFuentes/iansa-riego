@@ -11,6 +11,7 @@ import { ToastrService, ToastrModule } from 'ngx-toastr';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ClimaZona } from '../../../core/models/clima.model';
+import { EtoConsumoDia } from '../../../core/models/eto-consumo-dia.model';
 import { TemporadasService } from '../../../core/services/temporadas.service';
 import { Temporada } from '../../../core/models/temporada.model';
 import Swal from 'sweetalert2';
@@ -90,6 +91,14 @@ export class ZonaViewComponent implements OnInit {
     { fecha: '', temp_min: 0, temp_max: 0, temp_promedio: 0, precipitacion: 0 },
   ];
 
+  // Datos para gráfico comparativo de ETo y consumos diarios
+  etoConsumoDia: EtoConsumoDia[] = [];
+  variableSeleccionada: string = 'eto';
+  temporadasVisibles: Record<number, boolean> = {};
+  chartEtoData: ChartData<'line'> = { labels: [], datasets: [] };
+  chartEtoOptions: any;
+  mostrarGraficoEto: boolean = false;
+
   constructor(
     private route: ActivatedRoute,
     private zonasService: ZonasService,
@@ -111,8 +120,12 @@ export class ZonaViewComponent implements OnInit {
           this.zona = data;
           this.obtenerConsumoAgua();
           this.obtenerClima();
+          this.obtenerEtoConsumoDia();
           this.temporadasService.getTemporadasActivas().subscribe({
-            next: (data) => (this.temporadas = data),
+            next: (data) => {
+              this.temporadas = data;
+              this.actualizarGraficoEtoConsumo();
+            },
             error: () => this.toastr.error('Error al cargar temporadas'),
           });
         },
@@ -819,5 +832,76 @@ export class ZonaViewComponent implements OnInit {
       .toISOString()
       .slice(0, 10)}.png`;
     link.click();
+  }
+
+  obtenerEtoConsumoDia(): void {
+    if (!this.zona?.id) return;
+
+    this.zonasService.getEtoConsumoDia(this.zona.id).subscribe({
+      next: (data) => {
+        this.etoConsumoDia = data.sort(
+          (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
+        );
+        const ids = Array.from(new Set(this.etoConsumoDia.map((d) => d.id_temporada)));
+        ids.forEach((id) => {
+          if (this.temporadasVisibles[id] === undefined) this.temporadasVisibles[id] = true;
+        });
+        this.actualizarGraficoEtoConsumo();
+      },
+      error: (err) => console.error('Error al obtener eto_consumo_dia:', err),
+    });
+  }
+
+  actualizarGraficoEtoConsumo(): void {
+    if (!this.etoConsumoDia.length || !this.temporadas.length) {
+      this.chartEtoData = { labels: [], datasets: [] };
+      return;
+    }
+
+    const variable = this.variableSeleccionada;
+    const labelsSet = new Set<string>();
+    this.etoConsumoDia.forEach((d) => labelsSet.add(d.fecha.slice(5, 10)));
+    const labels = Array.from(labelsSet).sort();
+
+    const colores = ['#3e95cd', '#8e5ea2', '#3cba9f', '#e8c3b9', '#c45850', '#ff6384'];
+    const datasets: any[] = [];
+    let idx = 0;
+
+    this.temporadas.forEach((temp) => {
+      const datosTemp = this.etoConsumoDia
+        .filter((d) => d.id_temporada === temp.id)
+        .map((d) => ({ dia: d.fecha.slice(5, 10), valor: (d as any)[variable] }));
+      if (datosTemp.length === 0) return;
+
+      const data: number[] = [];
+      let acc = 0;
+      labels.forEach((lab) => {
+        const encontrado = datosTemp.find((e) => e.dia === lab);
+        if (encontrado) acc += Number(encontrado.valor);
+        data.push(acc);
+      });
+
+      const color = colores[idx % colores.length];
+      datasets.push({
+        data,
+        label: temp.nombre,
+        borderColor: color,
+        backgroundColor: color + '33',
+        fill: false,
+        hidden: this.temporadasVisibles[temp.id] === false,
+      });
+      idx++;
+    });
+
+    this.chartEtoOptions = {
+      responsive: true,
+      plugins: { legend: { display: true } },
+      scales: {
+        y: { title: { display: true, text: 'mm acumulados' } },
+        x: { title: { display: true, text: 'Día (MM-DD)' } },
+      },
+    };
+
+    this.chartEtoData = { labels, datasets };
   }
 }
