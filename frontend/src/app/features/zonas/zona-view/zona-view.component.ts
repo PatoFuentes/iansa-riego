@@ -24,6 +24,13 @@ import { CrawlerService } from '../../../core/services/crawler.service';
 
 declare var bootstrap: any;
 
+// 🎨 Colores fijos para cada temporada. Ajusta los nombres según tu base de datos
+const TEMPORADA_COLORS: Record<string, string> = {
+  '2022-2023': '#1abc9c',
+  '2023-2024': '#3498db',
+  '2024-2025': '#8e44ad',
+};
+
 @Component({
   selector: 'app-zona-view',
   imports: [
@@ -871,7 +878,8 @@ export class ZonaViewComponent implements OnInit {
     // Asignar colores a cada temporada si aún no tienen
     this.temporadas.forEach((temp) => {
       if (!this.temporadaColores[temp.id!]) {
-        this.temporadaColores[temp.id!] = colores[idx % colores.length];
+        this.temporadaColores[temp.id!] =
+          TEMPORADA_COLORS[temp.nombre] || colores[idx % colores.length];
         idx++;
       }
     });
@@ -897,6 +905,8 @@ export class ZonaViewComponent implements OnInit {
         label: temp.nombre,
         borderColor: color,
         backgroundColor: color + '33',
+        pointBackgroundColor: color,
+        pointBorderColor: color,
         fill: false,
         hidden: this.temporadasVisibles[temp.id!] === false,
       });
@@ -905,7 +915,12 @@ export class ZonaViewComponent implements OnInit {
 
     this.chartEtoOptions = {
       responsive: true,
-      plugins: { legend: { display: true } },
+      plugins: {
+        legend: {
+          display: true,
+          labels: { usePointStyle: true },
+        },
+      },
       scales: {
         y: { title: { display: true, text: 'mm acumulados' } },
         x: { title: { display: true, text: 'Día (MM-DD)' } },
