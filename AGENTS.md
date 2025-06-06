@@ -6,6 +6,20 @@ Este documento describe todos los **agentes** que participan en la plataforma de
 
 En el contexto de este proyecto, un *agente* es cualquier componente que se ejecuta de forma automática o semiautomática para realizar tareas específicas. Esto incluye servicios en segundo plano, scripts de automatización, crawlers, pipelines de CI/CD y contenedores desplegados en Cloud Run.
 
+## Referencias de la estructura del proyecto
+
+Para detalles de la organizacion de carpetas revisa [docs/frontend.md](docs/frontend.md). En `frontend/src/app` existen:
+
+- `core/` - servicios, guards e interceptores.
+- `features/` - modulos funcionales (usuarios, zonas, regiones, etc.).
+- `shared/` - componentes reutilizables.
+
+El backend se encuentra en `backend/` y su distribucion se explica en [docs/backend.md](docs/backend.md).
+
+## Estructura general de la base de datos
+
+La base de datos MySQL/MariaDB se describe en [docs/database.md](docs/database.md). Alli se listan tablas como `usuarios`, `regiones`, `zonas`, `temporadas` y `recomendaciones`, utiles para planificar nuevas entidades.
+
 ## Agentes registrados
 
 ### Backend - API Express
@@ -67,6 +81,15 @@ En el contexto de este proyecto, un *agente* es cualquier componente que se ejec
 4. Documente el nuevo agente en este archivo (`AGENTS.md`) con nombre, descripción, tecnología y punto de entrada.
 5. Si el agente requiere despliegue en Cloud Run, actualice `cloudbuild.yaml` y, de ser necesario, los workflows de GitHub Actions.
 6. Realice pruebas locales antes de hacer commit y abra un Pull Request siguiendo las buenas prácticas del README.
+7. Respete las convenciones de nombre y la estructura de carpetas descritas en la documentacion del proyecto.
+
+## Pautas para generar componentes Angular
+
+Utiliza `ng generate component <ruta>` para crear nuevos componentes. Ubica el codigo en `features/<modulo>` si el componente es especifico de un modulo, o en `shared/` cuando sea reutilizable.
+
+## Como agregar nuevos modelos o tablas
+
+Las tablas se gestionan en MySQL/MariaDB y cualquier modificacion debe quedar registrada en [docs/database.md](docs/database.md). Puedes enlazar scripts de migracion o usar un ORM si se integra en el futuro.
 
 ## Mantenimiento y monitoreo
 
