@@ -1074,7 +1074,7 @@ export class ZonaViewComponent implements OnInit {
 
     const link = document.createElement('a');
     link.href = imagen;
-    link.download = `ETo_${this.zona.nombre}_${new Date()
+    link.download = `ETo_${this.zona.nombre}_${this.variableSeleccionada}_${new Date()
       .toISOString()
       .slice(0, 10)}.png`;
     link.click();
