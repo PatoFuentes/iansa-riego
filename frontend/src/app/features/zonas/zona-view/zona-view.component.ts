@@ -1045,10 +1045,10 @@ export class ZonaViewComponent implements OnInit {
         fecha: dia.fecha,
         eto: +dia.eto,
         kc: +dia.kc,
-        consumo_pivote: +dia.consumo_pivote,
-        consumo_cobertura: +dia.consumo_cobertura,
-        consumo_carrete: +dia.consumo_carrete,
-        consumo_aspersor: +dia.consumo_aspersor,
+        consumo_pivote: +dia.consumo_pivote!,
+        consumo_cobertura: +dia.consumo_cobertura!,
+        consumo_carrete: +dia.consumo_carrete!,
+        consumo_aspersor: +dia.consumo_aspersor!,
       } as EtoConsumoDia;
       return this.zonasService
         .guardarEtoConsumoDia(this.zona.id, datos)
