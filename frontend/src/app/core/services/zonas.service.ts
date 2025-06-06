@@ -52,4 +52,8 @@ export class ZonasService {
       `${this.apiUrl}/${zonaId}/eto-consumo-dia`
     );
   }
+
+  guardarEtoConsumoDia(zonaId: number, datos: EtoConsumoDia): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${zonaId}/eto-consumo-dia`, datos);
+  }
 }
