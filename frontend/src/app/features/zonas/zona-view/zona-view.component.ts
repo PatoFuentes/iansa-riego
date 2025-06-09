@@ -107,6 +107,21 @@ export class ZonaViewComponent implements OnInit {
   chartEtoOptions: any;
   mostrarGraficoEto: boolean = false;
 
+  // Admin: carga y registro de ETo diario
+  cargandoEto: boolean = false;
+  mostrarModalEto = false;
+  mostrarModalEtoManual = false;
+  etoSemanalPreview: any[] = [];
+  etoManual: {
+    fecha: string;
+    eto: number;
+    kc: number;
+    consumo_pivote?: number;
+    consumo_cobertura?: number;
+    consumo_carrete?: number;
+    consumo_aspersor?: number;
+  }[] = [{ fecha: '', eto: 0, kc: 1 }];
+
   constructor(
     private route: ActivatedRoute,
     private zonasService: ZonasService,
@@ -131,7 +146,9 @@ export class ZonaViewComponent implements OnInit {
           this.obtenerEtoConsumoDia();
           this.temporadasService.getTemporadasActivas().subscribe({
             next: (data) => {
-              this.temporadas = data.sort((a, b) => a.nombre.localeCompare(b.nombre));
+              this.temporadas = data.sort((a, b) =>
+                a.nombre.localeCompare(b.nombre)
+              );
               this.actualizarGraficoEtoConsumo();
             },
             error: () => this.toastr.error('Error al cargar temporadas'),
@@ -850,9 +867,12 @@ export class ZonaViewComponent implements OnInit {
         this.etoConsumoDia = data.sort(
           (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
         );
-        const ids = Array.from(new Set(this.etoConsumoDia.map((d) => d.id_temporada)));
+        const ids = Array.from(
+          new Set(this.etoConsumoDia.map((d) => d.id_temporada))
+        );
         ids.forEach((id) => {
-          if (this.temporadasVisibles[id] === undefined) this.temporadasVisibles[id] = true;
+          if (this.temporadasVisibles[id] === undefined)
+            this.temporadasVisibles[id] = true;
         });
         this.actualizarGraficoEtoConsumo();
       },
@@ -867,11 +887,16 @@ export class ZonaViewComponent implements OnInit {
     }
 
     const variable = this.variableSeleccionada;
-    const labelsSet = new Set<string>();
-    this.etoConsumoDia.forEach((d) => labelsSet.add(d.fecha.slice(5, 10)));
-    const labels = Array.from(labelsSet).sort();
+    const labels = this.generarLabelsPeriodo();
 
-    const colores = ['#3e95cd', '#156082', '#e97132', '#196b24', '#c45850', '#ff6384'];
+    const colores = [
+      '#3e95cd',
+      '#156082',
+      '#e97132',
+      '#196b24',
+      '#c45850',
+      '#ff6384',
+    ];
     const datasets: any[] = [];
     let idx = 0;
 
@@ -888,7 +913,10 @@ export class ZonaViewComponent implements OnInit {
     this.temporadas.forEach((temp) => {
       const datosTemp = this.etoConsumoDia
         .filter((d) => d.id_temporada === temp.id)
-        .map((d) => ({ dia: d.fecha.slice(5, 10), valor: (d as any)[variable] }));
+        .map((d) => ({
+          dia: d.fecha.slice(5, 10),
+          valor: (d as any)[variable],
+        }));
       if (datosTemp.length === 0) return;
 
       const data: number[] = [];
@@ -928,5 +956,152 @@ export class ZonaViewComponent implements OnInit {
     };
 
     this.chartEtoData = { labels, datasets };
+  }
+
+  recalcularConsumosEto(dia: any): void {
+    const calc = this.calcularConsumo(+dia.eto, +dia.kc);
+    dia.consumo_pivote = +calc.consumo_pivote;
+    dia.consumo_cobertura = +calc.consumo_cobertura;
+    dia.consumo_carrete = +calc.consumo_carrete;
+    dia.consumo_aspersor = +calc.consumo_aspersor;
+  }
+
+  cargarEtoSemanal(): void {
+    this.cargandoEto = true;
+    if (!this.zona.estacion_id || !this.zona.estacion_api) {
+      this.toastr.warning('Faltan datos de la estación');
+      this.cargandoEto = false;
+      return;
+    }
+    this.crawlerService
+      .obtenerETo(this.zona.estacion_id, this.zona.estacion_api)
+      .subscribe({
+        next: (data) => {
+          if (!data || !data.fechas) {
+            this.toastr.warning('No se encontraron datos de ETo');
+            this.cargandoEto = false;
+            return;
+          }
+          this.etoSemanalPreview = Object.keys(data.fechas).map((f) => {
+            const valor = +data.fechas[f];
+            const fila: any = {
+              fecha: f,
+              eto: valor,
+              kc: 1,
+            };
+            this.recalcularConsumosEto(fila);
+            return fila;
+          });
+          this.mostrarModalEto = true;
+          this.cargandoEto = false;
+        },
+        error: () => {
+          this.toastr.error('Error al obtener datos de ETo');
+          this.cargandoEto = false;
+        },
+      });
+  }
+
+  guardarEtoSemanal(): void {
+    if (!this.temporadaSeleccionadaId) {
+      this.toastr.warning('Seleccione una temporada');
+      return;
+    }
+    const peticiones = this.etoSemanalPreview.map((dia) => {
+      const datos = {
+        id_zona: this.zona.id,
+        id_temporada: this.temporadaSeleccionadaId!,
+        fecha: dia.fecha,
+        eto: +dia.eto,
+        kc: +dia.kc,
+        consumo_pivote: +dia.consumo_pivote,
+        consumo_cobertura: +dia.consumo_cobertura,
+        consumo_carrete: +dia.consumo_carrete,
+        consumo_aspersor: +dia.consumo_aspersor,
+      } as EtoConsumoDia;
+      return this.zonasService
+        .guardarEtoConsumoDia(this.zona.id, datos)
+        .toPromise();
+    });
+
+    Promise.all(peticiones)
+      .then(() => {
+        this.toastr.success('✅ ETo diario guardado');
+        this.obtenerEtoConsumoDia();
+        this.mostrarModalEto = false;
+      })
+      .catch(() => {
+        this.toastr.error('❌ Error al guardar los datos');
+        this.obtenerEtoConsumoDia();
+        this.mostrarModalEto = false;
+      });
+  }
+
+  agregarFilaEtoManual(): void {
+    this.etoManual.push({ fecha: '', eto: 0, kc: 1 });
+  }
+
+  abrirModalEtoManual(): void {
+    this.mostrarModalEtoManual = true;
+  }
+
+  guardarEtoManual(): void {
+    if (!this.temporadaSeleccionadaId) {
+      this.toastr.warning('Seleccione una temporada');
+      return;
+    }
+    const peticiones = this.etoManual.map((dia) => {
+      this.recalcularConsumosEto(dia);
+      const datos = {
+        id_zona: this.zona.id,
+        id_temporada: this.temporadaSeleccionadaId!,
+        fecha: dia.fecha,
+        eto: +dia.eto,
+        kc: +dia.kc,
+        consumo_pivote: +dia.consumo_pivote!,
+        consumo_cobertura: +dia.consumo_cobertura!,
+        consumo_carrete: +dia.consumo_carrete!,
+        consumo_aspersor: +dia.consumo_aspersor!,
+      } as EtoConsumoDia;
+      return this.zonasService
+        .guardarEtoConsumoDia(this.zona.id, datos)
+        .toPromise();
+    });
+
+    Promise.all(peticiones)
+      .then(() => {
+        this.toastr.success('✅ ETo manual guardado');
+        this.obtenerEtoConsumoDia();
+        this.mostrarModalEtoManual = false;
+        this.etoManual = [{ fecha: '', eto: 0, kc: 1 }];
+      })
+      .catch(() => {
+        this.toastr.error('❌ Error al guardar el ETo');
+      });
+  }
+
+  @ViewChild('graficoEtoCanvas') graficoEtoCanvas!: ElementRef;
+  descargarGraficoEto(): void {
+    const canvas: HTMLCanvasElement = this.graficoEtoCanvas.nativeElement;
+    const imagen = canvas.toDataURL('image/png');
+
+    const link = document.createElement('a');
+    link.href = imagen;
+    link.download = `ETo_${this.zona.nombre}_${
+      this.variableSeleccionada
+    }_${new Date().toISOString().slice(0, 10)}.png`;
+    link.click();
+  }
+
+  private generarLabelsPeriodo(): string[] {
+    const labels: string[] = [];
+    const start = new Date('2000-09-01');
+    const end = new Date('2001-03-23');
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      labels.push(`${month}-${day}`);
+    }
+    return labels;
   }
 }
