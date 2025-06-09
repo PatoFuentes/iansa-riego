@@ -973,6 +973,14 @@ export class ZonaViewComponent implements OnInit {
           display: true,
           labels: { usePointStyle: true },
         },
+        tooltip: {
+              callbacks: {
+                label: (context: any) => {
+                  const valor = context.parsed.y;
+                  return `${Math.round(valor)} mm acumulados`;
+                },
+              },
+            },
       },
       scales: {
         y: { title: { display: true, text: 'mm acumulados' } },
