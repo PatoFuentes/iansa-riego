@@ -16,7 +16,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Configuración de la base de datos
 
-const dbHost = process.env.DB_HOST || "";
+// Si la variable DB_HOST no está definida, asumimos "localhost" para
+// evitar fallos de conexión en desarrollo.
+const dbHost = process.env.DB_HOST || "localhost";
 const dbConfig = dbHost.startsWith("/cloudsql")
   ? {
       user: process.env.DB_USER,
