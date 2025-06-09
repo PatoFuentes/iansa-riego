@@ -938,6 +938,19 @@ export class ZonaViewComponent implements OnInit {
         fill: false,
         hidden: this.temporadasVisibles[temp.id!] === false,
       });
+      const ultimoValor = data[data.length - 1];
+      datasets.push({
+        data: new Array(data.length - 1).fill(null).concat(ultimoValor),
+        label: `${temp.nombre} total: ${Math.round(ultimoValor)} mm`,
+        borderColor: 'transparent',
+        backgroundColor: color,
+        pointRadius: 6,
+        pointHoverRadius: 8,
+        pointBackgroundColor: color,
+        fill: false,
+        type: 'line',
+        hidden: this.temporadasVisibles[temp.id!] === false,
+      });
       idx++;
     });
 
