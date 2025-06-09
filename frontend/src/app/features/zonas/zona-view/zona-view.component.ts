@@ -21,6 +21,7 @@ import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { CrawlerService } from '../../../core/services/crawler.service';
+import { firstValueFrom } from 'rxjs';
 
 declare var bootstrap: any;
 
@@ -121,6 +122,17 @@ export class ZonaViewComponent implements OnInit {
     consumo_carrete?: number;
     consumo_aspersor?: number;
   }[] = [{ fecha: '', eto: 0, kc: 1 }];
+
+  // Eliminación masiva
+  mostrarModalEliminarConsumo = false;
+  mostrarModalEliminarClima = false;
+  mostrarModalEliminarEto = false;
+  filtroConsumo = '';
+  filtroClima = '';
+  filtroEto = '';
+  consumoSeleccionadosIds: number[] = [];
+  climaSeleccionadosIds: number[] = [];
+  etoSeleccionadosIds: number[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -1116,5 +1128,123 @@ export class ZonaViewComponent implements OnInit {
       labels.push(`${month}-${day}`);
     }
     return labels;
+  }
+
+  abrirModalEliminarConsumo(): void {
+    this.consumoSeleccionadosIds = [];
+    this.filtroConsumo = '';
+    this.mostrarModalEliminarConsumo = true;
+  }
+
+  abrirModalEliminarClima(): void {
+    this.climaSeleccionadosIds = [];
+    this.filtroClima = '';
+    this.mostrarModalEliminarClima = true;
+  }
+
+  abrirModalEliminarEto(): void {
+    this.etoSeleccionadosIds = [];
+    this.filtroEto = '';
+    this.mostrarModalEliminarEto = true;
+  }
+
+  get consumoBusqueda(): ConsumoAgua[] {
+    const term = this.filtroConsumo.toLowerCase();
+    return this.consumoAgua.filter(
+      (c) => c.semana_inicio.includes(term) || c.semana_fin.includes(term)
+    );
+  }
+
+  get climaBusqueda(): ClimaZona[] {
+    const term = this.filtroClima.toLowerCase();
+    return this.climaZona.filter((c) => c.fecha.includes(term));
+  }
+
+  get etoBusqueda(): EtoConsumoDia[] {
+    const term = this.filtroEto.toLowerCase();
+    return this.etoConsumoDia.filter((e) => e.fecha.includes(term));
+  }
+
+  confirmarEliminarConsumo(): void {
+    if (this.consumoSeleccionadosIds.length === 0) return;
+    Swal.fire({
+      title: '¿Eliminar registros seleccionados?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+    }).then((r) => {
+      if (r.isConfirmed) {
+        const peticiones = this.consumoSeleccionadosIds.map((id) =>
+          firstValueFrom(this.aguaService.eliminarConsumoAgua(id, this.zona.id))
+        );
+        Promise.all(peticiones).then(() => {
+          this.toastr.success('Registros eliminados');
+          this.obtenerConsumoAgua();
+          this.mostrarModalEliminarConsumo = false;
+        });
+      }
+    });
+  }
+
+  confirmarEliminarClima(): void {
+    if (this.climaSeleccionadosIds.length === 0) return;
+    Swal.fire({
+      title: '¿Eliminar registros seleccionados?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+    }).then((r) => {
+      if (r.isConfirmed) {
+        const peticiones = this.climaSeleccionadosIds.map((id) =>
+          firstValueFrom(this.zonasService.eliminarClima(this.zona.id, id))
+        );
+        Promise.all(peticiones).then(() => {
+          this.toastr.success('Registros eliminados');
+          this.obtenerClima();
+          this.mostrarModalEliminarClima = false;
+        });
+      }
+    });
+  }
+
+  confirmarEliminarEto(): void {
+    if (this.etoSeleccionadosIds.length === 0) return;
+    Swal.fire({
+      title: '¿Eliminar registros seleccionados?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+    }).then((r) => {
+      if (r.isConfirmed) {
+        const peticiones = this.etoSeleccionadosIds.map((id) =>
+          firstValueFrom(
+            this.zonasService.eliminarEtoConsumoDia(this.zona.id, id)
+          )
+        );
+        Promise.all(peticiones).then(() => {
+          this.toastr.success('Registros eliminados');
+          this.obtenerEtoConsumoDia();
+          this.mostrarModalEliminarEto = false;
+        });
+      }
+    });
+  }
+
+  onCheckChange(id: number, event: Event, tipo: string): void {
+    const checked = (event.target as HTMLInputElement).checked;
+
+    const lista =
+      tipo === 'consumo'
+        ? this.consumoSeleccionadosIds
+        : tipo === 'clima'
+        ? this.climaSeleccionadosIds
+        : this.etoSeleccionadosIds;
+
+    if (checked) {
+      if (!lista.includes(id)) lista.push(id);
+    } else {
+      const idx = lista.indexOf(id);
+      if (idx > -1) lista.splice(idx, 1);
+    }
   }
 }

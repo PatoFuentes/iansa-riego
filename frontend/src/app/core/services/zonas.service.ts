@@ -47,6 +47,10 @@ export class ZonasService {
     return this.http.post(`${this.apiUrl}/${zonaId}/clima-semanal`, datos);
   }
 
+  eliminarClima(zonaId: number, id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${zonaId}/clima-semanal/${id}`);
+  }
+
   getEtoConsumoDia(zonaId: number): Observable<EtoConsumoDia[]> {
     return this.http.get<EtoConsumoDia[]>(
       `${this.apiUrl}/${zonaId}/eto-consumo-dia`
@@ -55,5 +59,9 @@ export class ZonasService {
 
   guardarEtoConsumoDia(zonaId: number, datos: EtoConsumoDia): Observable<any> {
     return this.http.post(`${this.apiUrl}/${zonaId}/eto-consumo-dia`, datos);
+  }
+
+  eliminarEtoConsumoDia(zonaId: number, id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${zonaId}/eto-consumo-dia/${id}`);
   }
 }
