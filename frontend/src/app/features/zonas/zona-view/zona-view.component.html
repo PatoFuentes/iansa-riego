@@ -209,6 +209,253 @@
       ></canvas>
     </div>
   </div>
+
+  <!-- 📊 Sección: Comparar Consumos Diarios -->
+  <div class="card shadow-sm border-dark mb-4">
+    <div
+      class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+      style="cursor: pointer"
+      (click)="mostrarGraficoEto = !mostrarGraficoEto"
+    >
+      <h5 class="mb-0">Comparación Diario por Temporada 📊</h5>
+      <i
+        class="fas"
+        [ngClass]="mostrarGraficoEto ? 'fa-chevron-up' : 'fa-chevron-down'"
+      ></i>
+    </div>
+    <div class="card-body" *ngIf="mostrarGraficoEto">
+      <div *ngIf="esAdmin" class="mb-3 text-end">
+        <button
+          class="btn btn-success me-2"
+          [disabled]="cargandoEto"
+          (click)="cargarEtoSemanal()"
+        >
+          <span *ngIf="cargandoEto">
+            <i class="spinner-border spinner-border-sm me-1"></i> Cargando...
+          </span>
+          <span *ngIf="!cargandoEto">Ver ETo semanal</span>
+        </button>
+        <button class="btn btn-outline-primary" (click)="abrirModalEtoManual()">
+          Agregar ETo Manual
+        </button>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Variable</label>
+          <select
+            class="form-select"
+            [(ngModel)]="variableSeleccionada"
+            (change)="actualizarGraficoEtoConsumo()"
+          >
+            <option value="eto">ETo (mm)</option>
+            <option value="consumo_pivote">Pivote (mm)</option>
+            <option value="consumo_cobertura">Cobertura (mm)</option>
+            <option value="consumo_carrete">Carrete (mm)</option>
+            <option value="consumo_aspersor">Aspersión (mm)</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Temporadas</label>
+          <div *ngFor="let temp of temporadas">
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [id]="'temp' + temp.id!"
+                [(ngModel)]="temporadasVisibles[temp.id!]"
+                (change)="actualizarGraficoEtoConsumo()"
+              />
+              <label
+                class="form-check-label"
+                [for]="'temp' + temp.id!"
+                [style.color]="temporadaColores[temp.id!]"
+              >
+                {{ temp.nombre }}
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-outline-success mb-3" (click)="descargarGraficoEto()">
+        Descargar Gráfico
+      </button>
+      <canvas
+        baseChart
+        #graficoEtoCanvas
+        [data]="chartEtoData"
+        [options]="chartEtoOptions"
+        [type]="'line'"
+      ></canvas>
+    </div>
+  </div>
+
+  <!-- 🟢 Modal: Previsualizar ETo Diario -->
+  <div
+    class="modal fade"
+    id="modalEto"
+    tabindex="-1"
+    aria-hidden="true"
+    [ngClass]="{ 'show d-block': mostrarModalEto }"
+    style="background-color: rgba(0, 0, 0, 0.5)"
+  >
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Previsualización ETo Diario</h5>
+          <button type="button" class="btn-close" (click)="mostrarModalEto = false"></button>
+        </div>
+        <div class="modal-body">
+          <div class="col-md-4 mb-2">
+            <label>Temporada:</label>
+            <select class="form-select" [(ngModel)]="temporadaSeleccionadaId">
+              <option [ngValue]="null" disabled>Seleccionar temporada</option>
+              <option *ngFor="let temp of temporadas" [ngValue]="temp.id">
+                {{ temp.nombre }}
+              </option>
+            </select>
+          </div>
+          <table class="table table-striped table-sm text-center">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>ETo (mm)</th>
+                <th>Kc</th>
+                <th>Pivote</th>
+                <th>Cobertura</th>
+                <th>Carrete</th>
+                <th>Aspersión</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let dia of etoSemanalPreview">
+                <td>{{ dia.fecha | date : 'dd-MM-yyyy' }}</td>
+                <td>{{ dia.eto | number : '1.1-1' }}</td>
+                <td>
+                  <input
+                    type="number"
+                    step="0.01"
+                    class="form-control form-control-sm text-center"
+                    [(ngModel)]="dia.kc"
+                    (ngModelChange)="recalcularConsumosEto(dia)"
+                  />
+                </td>
+                <td>{{ dia.consumo_pivote | number : '1.1-1' }}</td>
+                <td>{{ dia.consumo_cobertura | number : '1.1-1' }}</td>
+                <td>{{ dia.consumo_carrete | number : '1.1-1' }}</td>
+                <td>{{ dia.consumo_aspersor | number : '1.1-1' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="mostrarModalEto = false">
+            Cancelar
+          </button>
+          <button class="btn btn-primary" (click)="guardarEtoSemanal()">
+            Guardar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🟢 Modal: Agregar ETo Manual -->
+  <div
+    class="modal fade"
+    id="modalEtoManual"
+    tabindex="-1"
+    aria-hidden="true"
+    [ngClass]="{ 'show d-block': mostrarModalEtoManual }"
+    style="background-color: rgba(0, 0, 0, 0.5)"
+  >
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form (ngSubmit)="guardarEtoManual()">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title">Agregar ETo Manual</h5>
+            <button type="button" class="btn-close" (click)="mostrarModalEtoManual = false"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label>Temporada</label>
+              <select
+                class="form-select"
+                [(ngModel)]="temporadaSeleccionadaId"
+                name="temporadaEtoManual"
+                required
+              >
+                <option [ngValue]="null" disabled>Seleccionar temporada</option>
+                <option *ngFor="let temp of temporadas" [ngValue]="temp.id">
+                  {{ temp.nombre }}
+                </option>
+              </select>
+            </div>
+            <table class="table table-striped table-sm text-center">
+              <thead class="table-secondary">
+                <tr>
+                  <th>Fecha</th>
+                  <th>ETo (mm)</th>
+                  <th>Kc</th>
+                  <th>Pivote</th>
+                  <th>Cobertura</th>
+                  <th>Carrete</th>
+                  <th>Aspersión</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let dia of etoManual; let i = index">
+                  <td>
+                    <input
+                      type="date"
+                      class="form-control"
+                      [(ngModel)]="dia.fecha"
+                      name="fechaEto{{ i }}"
+                      required
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      step="0.01"
+                      class="form-control form-control-sm text-center"
+                      [(ngModel)]="dia.eto"
+                      name="eto{{ i }}"
+                      required
+                      (ngModelChange)="recalcularConsumosEto(dia)"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      step="0.01"
+                      class="form-control form-control-sm text-center"
+                      [(ngModel)]="dia.kc"
+                      name="kc{{ i }}"
+                      required
+                      (ngModelChange)="recalcularConsumosEto(dia)"
+                    />
+                  </td>
+                  <td>{{ dia.consumo_pivote | number : '1.1-1' }}</td>
+                  <td>{{ dia.consumo_cobertura | number : '1.1-1' }}</td>
+                  <td>{{ dia.consumo_carrete | number : '1.1-1' }}</td>
+                  <td>{{ dia.consumo_aspersor | number : '1.1-1' }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <button type="button" class="btn btn-outline-primary" (click)="agregarFilaEtoManual()">
+              ➕ Agregar Día
+            </button>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="mostrarModalEtoManual = false">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-success">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </main>
 
 <!-- 🔄 Modal combinado: Previsualizar y editar Recomendación -->

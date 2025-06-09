@@ -650,6 +650,91 @@ app.delete("/zonas/:zonaId/consumo-agua/:consumoId", (req, res) => {
   });
 });
 
+// Obtener datos de eto y consumo diario por zona
+app.get("/zonas/:zonaId/eto-consumo-dia", (req, res) => {
+  const { zonaId } = req.params;
+  const sql =
+    "SELECT * FROM eto_consumo_dia WHERE id_zona = ? ORDER BY fecha ASC";
+
+  db.query(sql, [zonaId], (err, results) => {
+    if (err) {
+      console.error("Error al obtener datos eto_consumo_dia:", err);
+      return res
+        .status(500)
+        .json({ error: "Error al obtener datos eto_consumo_dia" });
+    }
+
+    res.json(results);
+  });
+});
+
+// Registrar eto y consumos diarios de una zona
+app.post("/zonas/:zonaId/eto-consumo-dia", (req, res) => {
+  const { zonaId } = req.params;
+  const {
+    fecha,
+    eto,
+    kc,
+    consumo_pivote,
+    consumo_cobertura,
+    consumo_carrete,
+    consumo_aspersor,
+    id_temporada,
+  } = req.body;
+
+  const checkSql =
+    "SELECT 1 FROM eto_consumo_dia WHERE id_zona = ? AND fecha = ?";
+
+  db.query(checkSql, [zonaId, fecha], (err, rows) => {
+    if (err) {
+      console.error("❌ Error al verificar eto_consumo_dia:", err);
+      return res
+        .status(500)
+        .json({ error: "Error al verificar eto_consumo_dia" });
+    }
+
+    if (rows.length > 0) {
+      return res
+        .status(409)
+        .json({ message: "Ya existe registro para esta fecha" });
+    }
+
+    const insertSql = `
+        INSERT INTO eto_consumo_dia
+        (id_zona, id_temporada, fecha, eto, kc, consumo_pivote, consumo_cobertura, consumo_carrete, consumo_aspersor)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+
+    db.query(
+      insertSql,
+      [
+        zonaId,
+        id_temporada,
+        fecha,
+        redondearEntero(eto),
+        kc,
+        redondearEntero(consumo_pivote),
+        redondearEntero(consumo_cobertura),
+        redondearEntero(consumo_carrete),
+        redondearEntero(consumo_aspersor),
+      ],
+      (err, result) => {
+        if (err) {
+          console.error("❌ Error al registrar eto_consumo_dia:", err);
+          return res
+            .status(500)
+            .json({ error: "Error al registrar eto_consumo_dia" });
+        }
+
+        res.status(201).json({
+          message: "ETo diario registrado correctamente",
+          id: result.insertId,
+        });
+      }
+    );
+  });
+});
+
 // Obtener datos climaticos por zona
 app.get("/zonas/:zonaId/clima-semanal", (req, res) => {
   const { zonaId } = req.params;
