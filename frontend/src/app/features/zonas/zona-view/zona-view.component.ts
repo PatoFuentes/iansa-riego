@@ -146,7 +146,9 @@ export class ZonaViewComponent implements OnInit {
           this.obtenerEtoConsumoDia();
           this.temporadasService.getTemporadasActivas().subscribe({
             next: (data) => {
-              this.temporadas = data.sort((a, b) => a.nombre.localeCompare(b.nombre));
+              this.temporadas = data.sort((a, b) =>
+                a.nombre.localeCompare(b.nombre)
+              );
               this.actualizarGraficoEtoConsumo();
             },
             error: () => this.toastr.error('Error al cargar temporadas'),
@@ -865,9 +867,12 @@ export class ZonaViewComponent implements OnInit {
         this.etoConsumoDia = data.sort(
           (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
         );
-        const ids = Array.from(new Set(this.etoConsumoDia.map((d) => d.id_temporada)));
+        const ids = Array.from(
+          new Set(this.etoConsumoDia.map((d) => d.id_temporada))
+        );
         ids.forEach((id) => {
-          if (this.temporadasVisibles[id] === undefined) this.temporadasVisibles[id] = true;
+          if (this.temporadasVisibles[id] === undefined)
+            this.temporadasVisibles[id] = true;
         });
         this.actualizarGraficoEtoConsumo();
       },
@@ -882,11 +887,16 @@ export class ZonaViewComponent implements OnInit {
     }
 
     const variable = this.variableSeleccionada;
-    const labelsSet = new Set<string>();
-    this.etoConsumoDia.forEach((d) => labelsSet.add(d.fecha.slice(5, 10)));
-    const labels = Array.from(labelsSet).sort();
+    const labels = this.generarLabelsPeriodo();
 
-    const colores = ['#3e95cd', '#156082', '#e97132', '#196b24', '#c45850', '#ff6384'];
+    const colores = [
+      '#3e95cd',
+      '#156082',
+      '#e97132',
+      '#196b24',
+      '#c45850',
+      '#ff6384',
+    ];
     const datasets: any[] = [];
     let idx = 0;
 
@@ -903,7 +913,10 @@ export class ZonaViewComponent implements OnInit {
     this.temporadas.forEach((temp) => {
       const datosTemp = this.etoConsumoDia
         .filter((d) => d.id_temporada === temp.id)
-        .map((d) => ({ dia: d.fecha.slice(5, 10), valor: (d as any)[variable] }));
+        .map((d) => ({
+          dia: d.fecha.slice(5, 10),
+          valor: (d as any)[variable],
+        }));
       if (datosTemp.length === 0) return;
 
       const data: number[] = [];
@@ -1074,9 +1087,21 @@ export class ZonaViewComponent implements OnInit {
 
     const link = document.createElement('a');
     link.href = imagen;
-    link.download = `ETo_${this.zona.nombre}_${this.variableSeleccionada}_${new Date()
-      .toISOString()
-      .slice(0, 10)}.png`;
+    link.download = `ETo_${this.zona.nombre}_${
+      this.variableSeleccionada
+    }_${new Date().toISOString().slice(0, 10)}.png`;
     link.click();
+  }
+
+  private generarLabelsPeriodo(): string[] {
+    const labels: string[] = [];
+    const start = new Date('2000-09-01');
+    const end = new Date('2001-03-23');
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      labels.push(`${month}-${day}`);
+    }
+    return labels;
   }
 }
