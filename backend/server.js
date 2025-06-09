@@ -668,8 +668,8 @@ app.get("/zonas/:zonaId/eto-consumo-dia", (req, res) => {
   });
 });
 
-// Registrar eto y consumos diarios de una zona
-app.post("/zonas/:zonaId/eto-consumo-dia", (req, res) => {
+  // Registrar eto y consumos diarios de una zona
+  app.post("/zonas/:zonaId/eto-consumo-dia", (req, res) => {
   const { zonaId } = req.params;
   const {
     fecha,
@@ -732,6 +732,24 @@ app.post("/zonas/:zonaId/eto-consumo-dia", (req, res) => {
         });
       }
     );
+  });
+
+  // Eliminar registro de ETo diario
+  app.delete("/zonas/:zonaId/eto-consumo-dia/:id", (req, res) => {
+    const { zonaId, id } = req.params;
+    const sql =
+      "DELETE FROM eto_consumo_dia WHERE id_eto_dia = ? AND id_zona = ?";
+
+    db.query(sql, [id, zonaId], (err) => {
+      if (err) {
+        console.error("❌ Error al eliminar eto_consumo_dia:", err);
+        return res
+          .status(500)
+          .json({ error: "Error al eliminar eto_consumo_dia" });
+      }
+
+      res.json({ message: "ETo diario eliminado correctamente" });
+    });
   });
 });
 
@@ -844,6 +862,21 @@ app.post("/zonas/:id/clima-semanal", (req, res) => {
         });
       }
     );
+  });
+});
+
+// Eliminar clima semanal por ID
+app.delete("/zonas/:zonaId/clima-semanal/:climaId", (req, res) => {
+  const { zonaId, climaId } = req.params;
+  const sql = "DELETE FROM clima_dia WHERE id = ? AND id_zona = ?";
+
+  db.query(sql, [climaId, zonaId], (err) => {
+    if (err) {
+      console.error("❌ Error al eliminar clima:", err);
+      return res.status(500).json({ error: "Error al eliminar clima" });
+    }
+
+    res.json({ message: "Clima eliminado correctamente" });
   });
 });
 

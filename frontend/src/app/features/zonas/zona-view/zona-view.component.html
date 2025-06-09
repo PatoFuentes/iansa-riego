@@ -57,6 +57,12 @@
         <button class="btn btn-outline-primary" (click)="abrirModalManual()">
           Agregar Manualmente
         </button>
+        <button
+          class="btn btn-outline-danger ms-2"
+          (click)="abrirModalEliminarConsumo()"
+        >
+          Eliminar Registros
+        </button>
       </div>
 
       <!-- 📊 Tabla de Consumo -->
@@ -109,10 +115,9 @@
             </tr>
           </tbody>
         </table>
-      </div>
-    </div>
-  </div>
-
+                </div>
+              </div>
+            </div>
   <!-- 🌦️ Sección: Información Climática -->
   <div class="card shadow-sm border-dark mb-4">
     <div
@@ -150,6 +155,12 @@
           (click)="abrirModalClimaManual()"
         >
           Agregar Clima Manual
+        </button>
+        <button
+          class="btn btn-outline-danger ms-2"
+          (click)="abrirModalEliminarClima()"
+        >
+          Eliminar Registros
         </button>
       </div>
 
@@ -237,6 +248,12 @@
         </button>
         <button class="btn btn-outline-primary" (click)="abrirModalEtoManual()">
           Agregar ETo Manual
+        </button>
+        <button
+          class="btn btn-outline-danger ms-2"
+          (click)="abrirModalEliminarEto()"
+        >
+          Eliminar Registros
         </button>
       </div>
       <div class="card-body text-end">
@@ -636,6 +653,189 @@
         </button>
         <button class="btn btn-primary" (click)="guardarRecomendacion()">
           Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Eliminar ETo Diario -->
+<div
+  class="modal fade"
+  id="modalEliminarEto"
+  tabindex="-1"
+  aria-hidden="true"
+  [ngClass]="{ 'show d-block': mostrarModalEliminarEto }"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Eliminar ETo Diario</h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="mostrarModalEliminarEto = false"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <input
+          type="text"
+          class="form-control mb-2"
+          placeholder="Buscar..."
+          [(ngModel)]="filtroEto"
+        />
+        <div class="tabla-scroll">
+          <table class="table table-sm table-bordered text-center">
+            <thead class="table-secondary">
+              <tr>
+                <th></th>
+                <th>Fecha</th>
+                <th>ETo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let e of etoBusqueda">
+                <td>
+                  <input
+                    type="checkbox"
+                    (change)="onCheckChange(e.id_eto_dia!, $event.target.checked, 'eto')"
+                  />
+                </td>
+                <td>{{ e.fecha | date : 'dd-MM-yyyy' }}</td>
+                <td>{{ e.eto }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="mostrarModalEliminarEto = false">Cancelar</button>
+        <button class="btn btn-danger" (click)="confirmarEliminarEto()">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Eliminar Clima -->
+<div
+  class="modal fade"
+  id="modalEliminarClima"
+  tabindex="-1"
+  aria-hidden="true"
+  [ngClass]="{ 'show d-block': mostrarModalEliminarClima }"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Eliminar Información Climática</h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="mostrarModalEliminarClima = false"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <input
+          type="text"
+          class="form-control mb-2"
+          placeholder="Buscar..."
+          [(ngModel)]="filtroClima"
+        />
+        <div class="tabla-scroll">
+          <table class="table table-sm table-bordered text-center">
+            <thead class="table-secondary">
+              <tr>
+                <th></th>
+                <th>Fecha</th>
+                <th>Min</th>
+                <th>Max</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let d of climaBusqueda">
+                <td>
+                  <input
+                    type="checkbox"
+                    (change)="onCheckChange(d.id!, $event.target.checked, 'clima')"
+                  />
+                </td>
+                <td>{{ d.fecha | date : 'dd-MM-yyyy' }}</td>
+                <td>{{ d.ta_min }}</td>
+                <td>{{ d.ta_max }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="mostrarModalEliminarClima = false">Cancelar</button>
+        <button class="btn btn-danger" (click)="confirmarEliminarClima()">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Eliminar Consumo -->
+<div
+  class="modal fade"
+  id="modalEliminarConsumo"
+  tabindex="-1"
+  aria-hidden="true"
+  [ngClass]="{ 'show d-block': mostrarModalEliminarConsumo }"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Eliminar Consumo de Agua</h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="mostrarModalEliminarConsumo = false"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <input
+          type="text"
+          class="form-control mb-2"
+          placeholder="Buscar..."
+          [(ngModel)]="filtroConsumo"
+        />
+        <div class="tabla-scroll">
+          <table class="table table-sm table-bordered text-center">
+            <thead class="table-secondary">
+              <tr>
+                <th></th>
+                <th>Semana</th>
+                <th>ETo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let c of consumoBusqueda">
+                <td>
+                  <input
+                    type="checkbox"
+                    (change)="onCheckChange(c.id!, $event.target.checked, 'consumo')"
+                  />
+                </td>
+                <td>
+                  {{ c.semana_inicio | date : 'dd-MM-yyyy' }} a
+                  {{ c.semana_fin | date : 'dd-MM-yyyy' }}
+                </td>
+                <td>{{ c.eto }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          class="btn btn-secondary"
+          (click)="mostrarModalEliminarConsumo = false"
+        >
+          Cancelar
+        </button>
+        <button class="btn btn-danger" (click)="confirmarEliminarConsumo()">
+          Eliminar
         </button>
       </div>
     </div>
