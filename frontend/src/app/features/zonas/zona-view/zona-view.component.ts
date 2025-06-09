@@ -1151,9 +1151,7 @@ export class ZonaViewComponent implements OnInit {
   get consumoBusqueda(): ConsumoAgua[] {
     const term = this.filtroConsumo.toLowerCase();
     return this.consumoAgua.filter(
-      (c) =>
-        c.semana_inicio.includes(term) ||
-        c.semana_fin.includes(term)
+      (c) => c.semana_inicio.includes(term) || c.semana_fin.includes(term)
     );
   }
 
@@ -1232,13 +1230,16 @@ export class ZonaViewComponent implements OnInit {
     });
   }
 
-  onCheckChange(id: number, checked: boolean, tipo: string): void {
+  onCheckChange(id: number, event: Event, tipo: string): void {
+    const checked = (event.target as HTMLInputElement).checked;
+
     const lista =
       tipo === 'consumo'
         ? this.consumoSeleccionadosIds
         : tipo === 'clima'
         ? this.climaSeleccionadosIds
         : this.etoSeleccionadosIds;
+
     if (checked) {
       if (!lista.includes(id)) lista.push(id);
     } else {

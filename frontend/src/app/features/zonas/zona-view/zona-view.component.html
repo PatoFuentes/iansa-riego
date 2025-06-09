@@ -698,7 +698,7 @@
                 <td>
                   <input
                     type="checkbox"
-                    (change)="onCheckChange(e.id_eto_dia!, $event.target.checked, 'eto')"
+                    (change)="onCheckChange(e.id_eto_dia!, $event, 'eto')"
                   />
                 </td>
                 <td>{{ e.fecha | date : 'dd-MM-yyyy' }}</td>
@@ -756,7 +756,7 @@
                 <td>
                   <input
                     type="checkbox"
-                    (change)="onCheckChange(d.id!, $event.target.checked, 'clima')"
+                    (change)="onCheckChange(d.id!,$event, 'clima')"
                   />
                 </td>
                 <td>{{ d.fecha | date : 'dd-MM-yyyy' }}</td>
@@ -814,7 +814,7 @@
                 <td>
                   <input
                     type="checkbox"
-                    (change)="onCheckChange(c.id!, $event.target.checked, 'consumo')"
+                    (change)="onCheckChange(c.id!, $event, 'consumo')"
                   />
                 </td>
                 <td>
