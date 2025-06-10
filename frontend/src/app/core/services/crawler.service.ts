@@ -39,4 +39,9 @@ export class CrawlerService {
 
     return this.http.get(`${this.baseUrl}/clima-semanal`, { params });
   }
+
+  /** Ejecuta la actualización diaria de caché en el backend */
+  actualizarCacheDaily(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cache-daily`, {});
+  }
 }

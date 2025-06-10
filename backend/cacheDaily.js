@@ -48,7 +48,11 @@ async function actualizarCache() {
   await conn.end();
 }
 
-actualizarCache().catch((e) => {
-  console.error('Fallo general:', e);
-  process.exit(1);
-});
+module.exports = { actualizarCache };
+
+if (require.main === module) {
+  actualizarCache().catch((e) => {
+    console.error('Fallo general:', e);
+    process.exit(1);
+  });
+}

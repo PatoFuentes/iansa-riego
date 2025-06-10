@@ -55,6 +55,7 @@ export class ZonaViewComponent implements OnInit {
   consumoAgua: ConsumoAgua[] = [];
   valorKc: number = 1.0;
   generando = false;
+  ejecutandoCache = false;
   mostrarConsumo: boolean = false;
   formularioManual: {
     semana_inicio: string;
@@ -774,6 +775,20 @@ export class ZonaViewComponent implements OnInit {
       data,
       `consumo_agua_${this.zona.nombre}_${temporadaNombre}.xlsx`
     );
+  }
+
+  ejecutarCacheDaily(): void {
+    this.ejecutandoCache = true;
+    this.crawlerService.actualizarCacheDaily().subscribe({
+      next: () => {
+        this.toastr.success('Caché actualizada correctamente');
+        this.ejecutandoCache = false;
+      },
+      error: () => {
+        this.toastr.error('Error al actualizar la caché');
+        this.ejecutandoCache = false;
+      },
+    });
   }
 
   exportarClima(): void {

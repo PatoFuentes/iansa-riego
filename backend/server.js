@@ -8,6 +8,7 @@ const {
   procesarDatosETo,
   procesarClimaSemanal,
 } = require("./crawlerINIA");
+const { actualizarCache } = require("./cacheDaily");
 const SALT_ROUNDS = 10;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -501,6 +502,17 @@ app.put("/zonas/:id", authMiddleware, (req, res) => {
 });
 
 // Información desde INIA
+
+// Ejecutar la actualización diaria de caché manualmente
+app.post('/api/cache-daily', async (_req, res) => {
+  try {
+    await actualizarCache();
+    res.json({ message: 'Caché actualizada' });
+  } catch (err) {
+    console.error('❌ Error al actualizar caché:', err);
+    res.status(500).json({ error: 'Error al actualizar caché' });
+  }
+});
 
 // Endpoint para obtener datos ETo desde estación
 app.get("/api/eto", async (req, res) => {
