@@ -1,7 +1,7 @@
 :host {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: calc(100vh - 60px);
   overflow: hidden;
   background-image: url("/assets/img/san-ignacio-28.webp");
   background-size: cover;
