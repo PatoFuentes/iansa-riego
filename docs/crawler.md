@@ -62,13 +62,17 @@ app.get("/api/eto", async (req, res) => {
 - Algunas estaciones requieren esperar a que el formulario se procese. Se maneja con `waitForSelector()`.
 - Si faltan muchos valores de ETo, el sistema los reemplaza por el promedio (máximo 2 datos faltantes).
 - Si hay más de 2 valores faltantes, el sistema cancela la generación automática y sugiere ingresar manualmente.
-- El JSON interceptado de INIA entrega valores de los últimos 7 días.
+ - El JSON interceptado de INIA entrega valores de los últimos 7 días.
+ - Para no repetir el scraping se creó un proceso diario que descarga
+   **items-ET.json** e **items-resumen.json** con `fetch` y los almacena en la
+  tabla `crawler_cache`. Los endpoints consultan esta caché y sólo ejecutan
+  Puppeteer si no existe registro del día. El script `backend/cacheDaily.js`
+  puede programarse con `cron` o Cloud Scheduler para refrescar estos datos.
 
----
+ ---
 
-## 🧪 Próximas Mejoras
+ ## 🧪 Próximas Mejoras
 
-- Cache de resultados para evitar múltiples scrapes en un mismo día.
-- Validaciones extras para estaciones nuevas.
-- Registro de logs de uso del crawler.
-- Usar una API proporcionada directamente por INIA
+ - Validaciones extras para estaciones nuevas.
+ - Registro de logs de uso del crawler.
+ - Usar una API proporcionada directamente por INIA

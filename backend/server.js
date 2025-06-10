@@ -2,8 +2,12 @@ require("dotenv").config();
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
-const { obtenerDatosETo } = require("./crawlerINIA");
-const { obtenerClimaSemanal } = require("./crawlerINIA");
+const {
+  obtenerDatosETo,
+  obtenerClimaSemanal,
+  procesarDatosETo,
+  procesarClimaSemanal,
+} = require("./crawlerINIA");
 const SALT_ROUNDS = 10;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -49,6 +53,24 @@ db.connect((err) => {
     });
   }
 });
+
+function leerCache(tipo) {
+  return new Promise((resolve) => {
+    const sql =
+      "SELECT json_data FROM crawler_cache WHERE fecha = CURDATE() AND tipo = ?";
+    db.query(sql, [tipo], (err, rows) => {
+      if (err || rows.length === 0) return resolve(null);
+      try {
+        const data = typeof rows[0].json_data === "string"
+          ? JSON.parse(rows[0].json_data)
+          : rows[0].json_data;
+        resolve(data);
+      } catch {
+        resolve(null);
+      }
+    });
+  });
+}
 
 // Middleware para proteger rutas enteras
 app.use("/usuarios", authMiddleware);
@@ -491,7 +513,20 @@ app.get("/api/eto", async (req, res) => {
   }
 
   try {
-    const resultado = await obtenerDatosETo(estacion_id, estacion_api);
+    const jsonEto = await leerCache("items-ET");
+    const jsonResumen = await leerCache("items-resumen");
+    let resultado = null;
+    if (jsonEto && jsonResumen) {
+      resultado = procesarDatosETo(
+        jsonEto,
+        jsonResumen,
+        estacion_id,
+        estacion_api
+      );
+    }
+    if (!resultado) {
+      resultado = await obtenerDatosETo(estacion_id, estacion_api);
+    }
     res.json(resultado);
   } catch (error) {
     console.error("❌ Error al obtener datos ETo:", error);
@@ -783,7 +818,18 @@ app.get("/api/clima-semanal", async (req, res) => {
   }
 
   try {
-    const datos = await obtenerClimaSemanal(estacion_id, estacion_api);
+    const jsonResumen = await leerCache("items-resumen");
+    let datos = null;
+    if (jsonResumen) {
+      datos = procesarClimaSemanal(
+        jsonResumen,
+        estacion_id,
+        estacion_api
+      );
+    }
+    if (!datos || datos.length === 0) {
+      datos = await obtenerClimaSemanal(estacion_id, estacion_api);
+    }
     if (!datos || datos.length === 0) {
       return res
         .status(404)
