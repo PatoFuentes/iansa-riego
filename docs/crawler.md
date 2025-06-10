@@ -64,12 +64,12 @@ app.get("/api/eto", async (req, res) => {
 - Si hay más de 2 valores faltantes, el sistema cancela la generación automática y sugiere ingresar manualmente.
  - El JSON interceptado de INIA entrega valores de los últimos 7 días.
  - Para no repetir el scraping se creó un proceso diario que descarga
-   **items-ET.json** e **items-resumen.json** con `fetch` y los almacena en la
-  tabla `crawler_cache`. Los endpoints consultan esta caché y sólo ejecutan
-  Puppeteer si no existe registro del día. El script `backend/cacheDaily.js`
-  puede programarse con `cron` o Cloud Scheduler para refrescar estos datos.
-  Las URLs de descarga se definen en las variables de entorno `ET_URL` y
-  `RESUMEN_URL`.
+   **items-ET.json** e **items-resumen.json** interceptando las páginas con
+   `puppeteer` y los almacena en la tabla `crawler_cache`. Los endpoints
+   consultan esta caché y sólo ejecutan Puppeteer si no existe registro del día.
+   El script `backend/cacheDaily.js` puede programarse con `cron` o Cloud
+   Scheduler para refrescar estos datos. Las páginas de origen se definen en las
+   variables de entorno `ET_URL` y `RESUMEN_URL`.
 
  ---
 
