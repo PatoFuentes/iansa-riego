@@ -2,8 +2,12 @@ const mysql = require('mysql2/promise');
 require('dotenv').config();
 
 // URLs de origen - ajustar si cambian en el sitio oficial
-const ET_URL = 'https://agrometeorologia.cl/evapotranspiracion/items-ET.json';
-const RESUMEN_URL = 'https://agrometeorologia.cl/items-resumen.json';
+const ET_URL =
+  process.env.ET_URL ||
+  'https://agrometeorologia.cl/evapotranspiracion/items-ET.json';
+const RESUMEN_URL =
+  process.env.RESUMEN_URL ||
+  'https://agrometeorologia.cl/items-resumen.json';
 
 // Configuracion similar a server.js
 const dbHost = process.env.DB_HOST || 'localhost';
@@ -31,21 +35,29 @@ async function actualizarCache() {
     { tipo: 'items-resumen', url: RESUMEN_URL },
   ];
 
+  const errores = [];
   for (const a of archivos) {
     try {
       const res = await fetch(a.url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.text();
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status} - ${a.url}`);
+      }
+      const data = await res.json();
       await conn.execute(
         'REPLACE INTO crawler_cache(fecha,tipo,json_data) VALUES (?,?,?)',
-        [hoy, a.tipo, data]
+        [hoy, a.tipo, JSON.stringify(data)]
       );
       console.log(`✅ Cache actualizado ${a.tipo}`);
     } catch (err) {
+      errores.push(`${a.tipo}: ${err.message}`);
       console.error(`Error al descargar ${a.tipo}:`, err.message);
     }
   }
+
   await conn.end();
+  if (errores.length > 0) {
+    throw new Error('Fallos al actualizar caché - ' + errores.join(' | '));
+  }
 }
 
 module.exports = { actualizarCache };

@@ -510,7 +510,7 @@ app.post('/api/cache-daily', async (_req, res) => {
     res.json({ message: 'Caché actualizada' });
   } catch (err) {
     console.error('❌ Error al actualizar caché:', err);
-    res.status(500).json({ error: 'Error al actualizar caché' });
+    res.status(500).json({ error: err.message || 'Error al actualizar caché' });
   }
 });
 

@@ -784,8 +784,9 @@ export class ZonaViewComponent implements OnInit {
         this.toastr.success('Caché actualizada correctamente');
         this.ejecutandoCache = false;
       },
-      error: () => {
-        this.toastr.error('Error al actualizar la caché');
+      error: (err) => {
+        const msg = err?.error?.error || 'Error al actualizar la caché';
+        this.toastr.error(msg);
         this.ejecutandoCache = false;
       },
     });

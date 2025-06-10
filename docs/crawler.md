@@ -68,6 +68,8 @@ app.get("/api/eto", async (req, res) => {
   tabla `crawler_cache`. Los endpoints consultan esta caché y sólo ejecutan
   Puppeteer si no existe registro del día. El script `backend/cacheDaily.js`
   puede programarse con `cron` o Cloud Scheduler para refrescar estos datos.
+  Las URLs de descarga se definen en las variables de entorno `ET_URL` y
+  `RESUMEN_URL`.
 
  ---
 
