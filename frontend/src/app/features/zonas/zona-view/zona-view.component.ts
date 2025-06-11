@@ -773,7 +773,7 @@ export class ZonaViewComponent implements OnInit {
         ?.nombre || 'todas';
     FileSaver.saveAs(
       data,
-      `consumo_agua_${this.zona.nombre}_${temporadaNombre}.xlsx`
+      `recomendacion_riego_${this.zona.nombre}_${temporadaNombre}.xlsx`
     );
   }
 
@@ -826,7 +826,7 @@ export class ZonaViewComponent implements OnInit {
         ?.nombre || 'todas';
     FileSaver.saveAs(
       data,
-      `clima_zona_${this.zona.nombre}_${temporadaNombre}.xlsx`
+      `grados_dia_${this.zona.nombre}_${temporadaNombre}.xlsx`
     );
   }
 

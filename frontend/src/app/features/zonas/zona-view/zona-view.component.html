@@ -29,7 +29,7 @@
       style="cursor: pointer"
       (click)="mostrarConsumo = !mostrarConsumo"
     >
-      <h5 class="mb-0">Consumo de Agua 💧</h5>
+      <h5 class="mb-0">Recomendación de Riego 💧</h5>
       <i
         class="fas"
         [ngClass]="mostrarConsumo ? 'fa-chevron-up' : 'fa-chevron-down'"
@@ -211,7 +211,7 @@
       style="cursor: pointer"
       (click)="mostrarGrafico = !mostrarGrafico"
     >
-      <h5 class="mb-0">Gráfico de Grados Día (T Base 3) 📈</h5>
+      <h5 class="mb-0">Grados Día (T Base 3) 📈</h5>
       <i
         class="fas"
         [ngClass]="mostrarGrafico ? 'fa-chevron-up' : 'fa-chevron-down'"
@@ -231,14 +231,14 @@
     </div>
   </div>
 
-  <!-- 📊 Sección: Comparar Consumos Diarios -->
+  <!-- 📊 Sección: Consumos Temporadas -->
   <div class="card shadow-sm border-dark mb-4">
     <div
       class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
       style="cursor: pointer"
       (click)="mostrarGraficoEto = !mostrarGraficoEto"
     >
-      <h5 class="mb-0">Comparación Diario por Temporada 📊</h5>
+      <h5 class="mb-0">Consumos Temporadas 📊</h5>
       <i
         class="fas"
         [ngClass]="mostrarGraficoEto ? 'fa-chevron-up' : 'fa-chevron-down'"
