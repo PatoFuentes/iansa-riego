@@ -582,6 +582,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#crawler_cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      📂 crawler_cache
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -589,6 +598,15 @@
       
         <li class="md-nav__item">
   <a href="#consideraciones-de-seguridad" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔐 Consideraciones de Seguridad
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consideraciones-de-seguridad_1" class="md-nav__link">
     <span class="md-ellipsis">
       🔐 Consideraciones de Seguridad
     </span>
@@ -747,6 +765,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#crawler_cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      📂 crawler_cache
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -754,6 +781,15 @@
       
         <li class="md-nav__item">
   <a href="#consideraciones-de-seguridad" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔐 Consideraciones de Seguridad
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consideraciones-de-seguridad_1" class="md-nav__link">
     <span class="md-ellipsis">
       🔐 Consideraciones de Seguridad
     </span>
@@ -797,6 +833,7 @@
 <span class="err">├──</span><span class="w"> </span><span class="n">temporadas</span>
 <span class="err">├──</span><span class="w"> </span><span class="n">recomendaciones</span>
 <span class="err">├──</span><span class="w"> </span><span class="n">consumo_agua</span>
+<span class="err">├──</span><span class="w"> </span><span class="n">crawler_cache</span>
 </code></pre></div>
 
 <hr />
@@ -1075,7 +1112,37 @@
 </tbody>
 </table>
 <hr />
+<h3 id="crawler_cache">📂 <code>crawler_cache</code><a class="headerlink" href="#crawler_cache" title="Permanent link">&para;</a></h3>
+<p>Almacena los archivos JSON descargados diariamente desde el sitio de INIA.</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fecha</td>
+<td>DATE</td>
+<td>Día al que pertenece la descarga</td>
+</tr>
+<tr>
+<td>tipo</td>
+<td>VARCHAR</td>
+<td><code>items-ET</code> o <code>items-resumen</code></td>
+</tr>
+<tr>
+<td>json_data</td>
+<td>JSON</td>
+<td>Contenido del archivo original completo</td>
+</tr>
+</tbody>
+</table>
+<hr />
 <h2 id="consideraciones-de-seguridad">🔐 Consideraciones de Seguridad<a class="headerlink" href="#consideraciones-de-seguridad" title="Permanent link">&para;</a></h2>
+<h2 id="consideraciones-de-seguridad_1">🔐 Consideraciones de Seguridad<a class="headerlink" href="#consideraciones-de-seguridad_1" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Las contraseñas se almacenan hasheadas.</li>
 <li>Acceso diferenciado por tipo de usuario (<code>tecnico</code>, <code>administrador</code>).</li>

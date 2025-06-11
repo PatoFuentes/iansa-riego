@@ -534,15 +534,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#proximas-mejoras" class="md-nav__link">
-    <span class="md-ellipsis">
-      🧪 Próximas Mejoras
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -725,15 +716,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#proximas-mejoras" class="md-nav__link">
-    <span class="md-ellipsis">
-      🧪 Próximas Mejoras
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -801,11 +783,17 @@
 <li>Si faltan muchos valores de ETo, el sistema los reemplaza por el promedio (máximo 2 datos faltantes).</li>
 <li>Si hay más de 2 valores faltantes, el sistema cancela la generación automática y sugiere ingresar manualmente.</li>
 <li>El JSON interceptado de INIA entrega valores de los últimos 7 días.</li>
+<li>Para no repetir el scraping se creó un proceso diario que descarga
+   <strong>items-ET.json</strong> e <strong>items-resumen.json</strong> interceptando las páginas con
+   <code>puppeteer</code> y los almacena en la tabla <code>crawler_cache</code>. Los endpoints
+   consultan esta caché y sólo ejecutan Puppeteer si no existe registro del día.
+   El script <code>backend/cacheDaily.js</code> puede programarse con <code>cron</code> o Cloud
+   Scheduler para refrescar estos datos. Las páginas de origen se definen en las
+   variables de entorno <code>ET_URL</code> y <code>RESUMEN_URL</code>.</li>
 </ul>
 <hr />
-<h2 id="proximas-mejoras">🧪 Próximas Mejoras<a class="headerlink" href="#proximas-mejoras" title="Permanent link">&para;</a></h2>
+<p>## 🧪 Próximas Mejoras</p>
 <ul>
-<li>Cache de resultados para evitar múltiples scrapes en un mismo día.</li>
 <li>Validaciones extras para estaciones nuevas.</li>
 <li>Registro de logs de uso del crawler.</li>
 <li>Usar una API proporcionada directamente por INIA</li>
