@@ -14,6 +14,7 @@ La base de datos utilizada por el sistema se llama `iansa_riego` y está diseña
 ├── temporadas
 ├── recomendaciones
 ├── consumo_agua
+├── crawler_cache
 ```
 
 ---
@@ -102,6 +103,20 @@ Guarda las recomendaciones generadas para riego basadas en ETo, kc y precipitaci
 | creado_en     | TIMESTAMP  | Fecha de creación                    |
 
 ---
+
+### 📂 `crawler_cache`
+
+Almacena los archivos JSON descargados diariamente desde el sitio de INIA.
+
+| Campo     | Tipo    | Descripción                               |
+|-----------|---------|-------------------------------------------|
+| fecha     | DATE    | Día al que pertenece la descarga          |
+| tipo      | VARCHAR | `items-ET` o `items-resumen`              |
+| json_data | JSON    | Contenido del archivo original completo   |
+
+---
+
+## 🔐 Consideraciones de Seguridad
 
 ## 🔐 Consideraciones de Seguridad
 

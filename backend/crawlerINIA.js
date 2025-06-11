@@ -202,7 +202,83 @@ async function obtenerClimaSemanal(estacion_id, estacion_api) {
   return datos;
 }
 
+function procesarDatosETo(jsonEto, jsonResumen, estacion_id, estacion_api) {
+  if (!jsonEto || !jsonResumen) return null;
+
+  const etoData = jsonEto.find(
+    (est) => est.id === String(estacion_id) && est.api === String(estacion_api)
+  );
+  const resumen = jsonResumen.find(
+    (est) => est.id === String(estacion_id) && est.api === String(estacion_api)
+  );
+  if (!etoData || !etoData["STACK-DAY"]) return null;
+
+  const datosSemana = {};
+  let totalETo = 0;
+
+  for (const [fecha, valores] of Object.entries(etoData["STACK-DAY"])) {
+    if (valores["ET-SUM"]) {
+      const et = parseFloat(valores["ET-SUM"]);
+      datosSemana[fecha] = et;
+      totalETo += et;
+    }
+  }
+
+  const fechas = Object.keys(datosSemana).sort();
+  const semana_inicio = fechas[0];
+  const semana_fin = fechas[fechas.length - 1];
+
+  let totalPrecipitacion = 0;
+  if (resumen && resumen["STACK-DAY"]) {
+    for (const [fecha, valores] of Object.entries(resumen["STACK-DAY"])) {
+      if (["ayer", "hoy", "manana", "pasado"].includes(fecha)) continue;
+      if (valores["PP-SUM"]) {
+        const pp = parseFloat(valores["PP-SUM"]);
+        if (!isNaN(pp)) totalPrecipitacion += pp;
+      }
+    }
+  }
+
+  return {
+    estacion: etoData.nombre,
+    semana_inicio,
+    semana_fin,
+    fechas: datosSemana,
+    totalETo: totalETo.toFixed(2),
+    totalPrecipitacion: totalPrecipitacion.toFixed(2),
+  };
+}
+
+function procesarClimaSemanal(jsonResumen, estacion_id, estacion_api) {
+  if (!jsonResumen) return null;
+  const resumenData = jsonResumen.find(
+    (est) => est.id === String(estacion_id) && est.api === String(estacion_api)
+  );
+  if (!resumenData || !resumenData["STACK-DAY"]) return null;
+  const datos = [];
+  for (const [fecha, valores] of Object.entries(resumenData["STACK-DAY"])) {
+    if (["ayer", "hoy", "manana", "pasado"].includes(fecha)) continue;
+    const tempMin = parseFloat(valores["TA-MIN"]);
+    const tempMax = parseFloat(valores["TA-MAX"]);
+    const precipitacion = parseFloat(valores["PP-SUM"]);
+    if (!isNaN(tempMin) && !isNaN(tempMax)) {
+      datos.push({
+        fecha,
+        temp_min: tempMin,
+        temp_max: tempMax,
+        temp_promedio: ((tempMin + tempMax) / 2).toFixed(2),
+        precipitacion: !isNaN(precipitacion)
+          ? parseFloat(precipitacion.toFixed(2))
+          : 0,
+      });
+    }
+  }
+  return datos;
+}
+
 module.exports = {
   obtenerDatosETo,
   obtenerClimaSemanal,
+  procesarDatosETo,
+  procesarClimaSemanal,
 };

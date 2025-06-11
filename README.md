@@ -66,6 +66,8 @@ DB_PASSWORD= (según configuración local)
 DB_NAME=iansa_riego
 JWT_SECRET=mi_clave_secreta_segura
 PORT=3000
+ET_URL=https://agrometeorologia.cl/evapotranspiracion/
+RESUMEN_URL=https://agrometeorologia.cl/
 ```
 
 Recuerda modificar `frontend/src/environments/environment.prod.ts` con la URL de

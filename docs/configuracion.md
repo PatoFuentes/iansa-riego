@@ -15,6 +15,8 @@ DB_PASSWORD=*****
 DB_NAME=iansa_riego
 PORT=3000
 JWT_SECRET=mi_clave_secreta_segura
+ET_URL=https://agrometeorologia.cl/evapotranspiracion/
+RESUMEN_URL=https://agrometeorologia.cl/
 ```
 
 > ⚠️ Nunca subir este archivo a GitHub. Está en `.gitignore`.

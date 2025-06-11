@@ -63,6 +63,16 @@
         >
           Eliminar Registros
         </button>
+        <button
+          class="btn btn-outline-info ms-2"
+          [disabled]="ejecutandoCache"
+          (click)="ejecutarCacheDaily()"
+        >
+          <span *ngIf="ejecutandoCache">
+            <i class="spinner-border spinner-border-sm me-1"></i> Actualizando...
+          </span>
+          <span *ngIf="!ejecutandoCache">Actualizar Caché</span>
+        </button>
       </div>
 
       <!-- 📊 Tabla de Consumo -->
