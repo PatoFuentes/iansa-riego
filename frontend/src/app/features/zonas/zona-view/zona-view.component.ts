@@ -734,8 +734,8 @@ export class ZonaViewComponent implements OnInit {
   }
   exportarConsumoAgua(): void {
     const datos = this.consumoFiltrado.map((d) => ({
-      'Semana Inicio': d.semana_inicio,
-      'Semana Fin': d.semana_fin,
+      'Semana Inicio': new Date(d.semana_inicio).toLocaleDateString('es-CL'),
+      'Semana Fin': new Date(d.semana_fin).toLocaleDateString('es-CL'),
       'ETo (mm)': d.eto,
       'Precipitación (mm)': d.precipitacion,
       Kc: d.kc,
@@ -773,7 +773,7 @@ export class ZonaViewComponent implements OnInit {
         ?.nombre || 'todas';
     FileSaver.saveAs(
       data,
-      `consumo_agua_${this.zona.nombre}_${temporadaNombre}.xlsx`
+      `recomendacion_riego_${this.zona.nombre}_${temporadaNombre}.xlsx`
     );
   }
 
@@ -794,7 +794,7 @@ export class ZonaViewComponent implements OnInit {
 
   exportarClima(): void {
     const datos = this.climaFiltrado.map((d) => ({
-      Fecha: d.fecha,
+      Fecha: new Date(d.fecha).toLocaleDateString('es-CL'),
       'Temperatura Mínima (°C)': d.ta_min,
       'Temperatura Máxima (°C)': d.ta_max,
       'Temperatura Promedio (°C)': d.ta_prom,
@@ -826,7 +826,7 @@ export class ZonaViewComponent implements OnInit {
         ?.nombre || 'todas';
     FileSaver.saveAs(
       data,
-      `clima_zona_${this.zona.nombre}_${temporadaNombre}.xlsx`
+      `grados_dia_${this.zona.nombre}_${temporadaNombre}.xlsx`
     );
   }
 
