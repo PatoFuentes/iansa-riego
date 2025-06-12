@@ -12,7 +12,7 @@
       />
     </a>
 
-    <!-- 🟣 Zona derecha: Botón de conceptos + botón menú -->
+    <!-- 🟣 Zona derecha: Botón de conceptos + botón de tema + botón menú -->
     <div class="d-flex align-items-center">
       <!-- 📘 Botón de Conceptos -->
       <button
@@ -20,6 +20,14 @@
         routerLink="/conceptos"
       >
         Conceptos de Riego
+      </button>
+
+      <!-- 🌗 Botón Modo oscuro/claro -->
+      <button
+        class="btn btn-outline-light me-2"
+        (click)="toggleDarkMode()"
+      >
+        {{ darkMode ? '☀️' : '🌙' }}
       </button>
 
       <!-- ☰ Botón de menú (solo visible en móviles) -->

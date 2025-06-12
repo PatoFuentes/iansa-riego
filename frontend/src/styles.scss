@@ -9,3 +9,27 @@ body {
   z-index: 9999 !important;
   position: fixed !important;
 }
+
+body.dark-mode {
+  background-color: #121212;
+  color: #f8f9fa;
+}
+
+body.dark-mode .navbar {
+  background-color: #212529 !important;
+}
+
+body.dark-mode .nav-menu {
+  background-color: rgba(0, 0, 0, 0.95);
+}
+
+body.dark-mode .top-section {
+  background: rgba(0, 0, 0, 0.6);
+  color: #f8f9fa;
+}
+
+body.dark-mode .region-link {
+  border-color: #f8f9fa;
+  color: #f8f9fa;
+  background: rgba(33, 37, 41, 0.9);
+}

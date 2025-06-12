@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../core/services/auth.service';
@@ -13,8 +13,9 @@ declare var bootstrap: any;
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   menuOpen = false;
+  darkMode = false;
 
   loginData = {
     correo: '',
@@ -27,8 +28,25 @@ export class NavbarComponent {
     private toastr: ToastrService
   ) {}
 
+  ngOnInit(): void {
+    this.darkMode = localStorage.getItem('darkMode') === 'true';
+    if (this.darkMode) {
+      document.body.classList.add('dark-mode');
+    }
+  }
+
   toggleMenu(): void {
     this.menuOpen = !this.menuOpen;
+  }
+
+  toggleDarkMode(): void {
+    this.darkMode = !this.darkMode;
+    if (this.darkMode) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+    localStorage.setItem('darkMode', this.darkMode.toString());
   }
 
   cerrarSesion(): void {
