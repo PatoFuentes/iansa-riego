@@ -23,7 +23,7 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
-          project_id: id-pagina-riego
+          project_id: demanda-riego-461720
           install_components: 'beta'
 
       - name: Trigger Cloud Build
