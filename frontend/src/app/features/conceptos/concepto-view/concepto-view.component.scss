@@ -54,3 +54,11 @@
   border-radius: 50%;
   background-size: 100% 100%;
 }
+
+/* Ajusta el espaciado superior en pantallas pequeñas para evitar que
+   el navbar fije oculte el logo de Iansa dentro del carrusel */
+@media (max-width: 768px) {
+  .fullscreen-slide {
+    padding-top: 5rem;
+  }
+}

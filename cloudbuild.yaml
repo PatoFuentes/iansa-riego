@@ -5,15 +5,15 @@ steps:
     dir: 'backend'
     args: [
       'build', 
-      '-t', 'gcr.io/id-pagina-riego/backend-riego', 
-      '--cache-from', 'gcr.io/id-pagina-riego/backend-riego',
+      '-t', 'gcr.io/demanda-riego-461720/backend-riego', 
+      '--cache-from', 'gcr.io/demanda-riego-461720/backend-riego',
       '.'
     ]
 
   # Push backend
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Push backend'
-    args: ['push', 'gcr.io/id-pagina-riego/backend-riego']
+    args: ['push', 'gcr.io/demanda-riego-461720/backend-riego']
 
   # Deploy backend
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -21,7 +21,7 @@ steps:
     entrypoint: 'gcloud'
     args: [
       'run', 'deploy', 'backend-riego',
-      '--image', 'gcr.io/id-pagina-riego/backend-riego',
+      '--image', 'gcr.io/demanda-riego-461720/backend-riego',
       '--region', 'us-central1',
       '--platform', 'managed',
       '--allow-unauthenticated'
@@ -33,15 +33,15 @@ steps:
     dir: 'frontend'
     args: [
       'build', 
-      '-t', 'gcr.io/id-pagina-riego/frontend-riego', 
-      '--cache-from', 'gcr.io/id-pagina-riego/frontend-riego',
+      '-t', 'gcr.io/demanda-riego-461720/frontend-riego', 
+      '--cache-from', 'gcr.io/demanda-riego-461720/frontend-riego',
       '.'
     ]
 
   # Push frontend
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Push frontend'
-    args: ['push', 'gcr.io/id-pagina-riego/frontend-riego']
+    args: ['push', 'gcr.io/demanda-riego-461720/frontend-riego']
 
   # Deploy frontend
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -49,12 +49,12 @@ steps:
     entrypoint: 'gcloud'
     args: [
       'run', 'deploy', 'frontend-riego',
-      '--image', 'gcr.io/id-pagina-riego/frontend-riego',
+      '--image', 'gcr.io/demanda-riego-461720/frontend-riego',
       '--region', 'us-central1',
       '--platform', 'managed',
       '--allow-unauthenticated'
     ]
 
 images:
-  - 'gcr.io/id-pagina-riego/backend-riego'
-  - 'gcr.io/id-pagina-riego/frontend-riego'
+  - 'gcr.io/demanda-riego-461720/backend-riego'
+  - 'gcr.io/demanda-riego-461720/frontend-riego'

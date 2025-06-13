@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -38,5 +38,12 @@ export class CrawlerService {
       .set('estacion_api', estacion_api);
 
     return this.http.get(`${this.baseUrl}/clima-semanal`, { params });
+  }
+
+  /** Ejecuta la actualización diaria de caché en el backend */
+  actualizarCacheDaily(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cache-daily`, {}).pipe(
+      catchError((err) => throwError(() => err))
+    );
   }
 }

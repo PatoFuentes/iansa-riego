@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Zona } from '../models/zona.model';
 import { ClimaZona } from '../models/clima.model';
+import { EtoConsumoDia } from '../models/eto-consumo-dia.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -44,5 +45,23 @@ export class ZonasService {
 
   guardarClimaSemanal(zonaId: number, datos: ClimaZona): Observable<any> {
     return this.http.post(`${this.apiUrl}/${zonaId}/clima-semanal`, datos);
+  }
+
+  eliminarClima(zonaId: number, id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${zonaId}/clima-semanal/${id}`);
+  }
+
+  getEtoConsumoDia(zonaId: number): Observable<EtoConsumoDia[]> {
+    return this.http.get<EtoConsumoDia[]>(
+      `${this.apiUrl}/${zonaId}/eto-consumo-dia`
+    );
+  }
+
+  guardarEtoConsumoDia(zonaId: number, datos: EtoConsumoDia): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${zonaId}/eto-consumo-dia`, datos);
+  }
+
+  eliminarEtoConsumoDia(zonaId: number, id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${zonaId}/eto-consumo-dia/${id}`);
   }
 }

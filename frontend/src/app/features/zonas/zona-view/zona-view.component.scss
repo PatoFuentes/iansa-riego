@@ -39,6 +39,8 @@
 .tabla-scroll {
   max-height: 400px;
   overflow-y: auto;
+  overflow-x: auto;
+  display: block;
 }
 
 .tabla-fija thead th {

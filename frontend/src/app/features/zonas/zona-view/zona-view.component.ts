@@ -11,6 +11,7 @@ import { ToastrService, ToastrModule } from 'ngx-toastr';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ClimaZona } from '../../../core/models/clima.model';
+import { EtoConsumoDia } from '../../../core/models/eto-consumo-dia.model';
 import { TemporadasService } from '../../../core/services/temporadas.service';
 import { Temporada } from '../../../core/models/temporada.model';
 import Swal from 'sweetalert2';
@@ -20,8 +21,16 @@ import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { CrawlerService } from '../../../core/services/crawler.service';
+import { firstValueFrom } from 'rxjs';
 
 declare var bootstrap: any;
+
+// 🎨 Colores fijos para cada temporada. Ajusta los nombres según tu base de datos
+const TEMPORADA_COLORS: Record<string, string> = {
+  '2022-2023': '#1abc9c',
+  '2023-2024': '#3498db',
+  '2024-2025': '#8e44ad',
+};
 
 @Component({
   selector: 'app-zona-view',
@@ -46,6 +55,7 @@ export class ZonaViewComponent implements OnInit {
   consumoAgua: ConsumoAgua[] = [];
   valorKc: number = 1.0;
   generando = false;
+  ejecutandoCache = false;
   mostrarConsumo: boolean = false;
   formularioManual: {
     semana_inicio: string;
@@ -90,6 +100,41 @@ export class ZonaViewComponent implements OnInit {
     { fecha: '', temp_min: 0, temp_max: 0, temp_promedio: 0, precipitacion: 0 },
   ];
 
+  // Datos para gráfico comparativo de ETo y consumos diarios
+  etoConsumoDia: EtoConsumoDia[] = [];
+  variableSeleccionada: string = 'eto';
+  temporadasVisibles: Record<number, boolean> = {};
+  temporadaColores: Record<number, string> = {};
+  chartEtoData: ChartData<'line'> = { labels: [], datasets: [] };
+  chartEtoOptions: any;
+  mostrarGraficoEto: boolean = false;
+
+  // Admin: carga y registro de ETo diario
+  cargandoEto: boolean = false;
+  mostrarModalEto = false;
+  mostrarModalEtoManual = false;
+  etoSemanalPreview: any[] = [];
+  etoManual: {
+    fecha: string;
+    eto: number;
+    kc: number;
+    consumo_pivote?: number;
+    consumo_cobertura?: number;
+    consumo_carrete?: number;
+    consumo_aspersor?: number;
+  }[] = [{ fecha: '', eto: 0, kc: 1 }];
+
+  // Eliminación masiva
+  mostrarModalEliminarConsumo = false;
+  mostrarModalEliminarClima = false;
+  mostrarModalEliminarEto = false;
+  filtroConsumo = '';
+  filtroClima = '';
+  filtroEto = '';
+  consumoSeleccionadosIds: number[] = [];
+  climaSeleccionadosIds: number[] = [];
+  etoSeleccionadosIds: number[] = [];
+
   constructor(
     private route: ActivatedRoute,
     private zonasService: ZonasService,
@@ -111,8 +156,14 @@ export class ZonaViewComponent implements OnInit {
           this.zona = data;
           this.obtenerConsumoAgua();
           this.obtenerClima();
+          this.obtenerEtoConsumoDia();
           this.temporadasService.getTemporadasActivas().subscribe({
-            next: (data) => (this.temporadas = data),
+            next: (data) => {
+              this.temporadas = data.sort((a, b) =>
+                a.nombre.localeCompare(b.nombre)
+              );
+              this.actualizarGraficoEtoConsumo();
+            },
             error: () => this.toastr.error('Error al cargar temporadas'),
           });
         },
@@ -637,6 +688,11 @@ export class ZonaViewComponent implements OnInit {
         (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
       );
 
+    if (datos.length === 0) {
+      this.chartData = { labels: [], datasets: [] };
+      return; // evita errores por arreglo vacío
+    }
+
     const labels = datos.map((d) =>
       new Date(d.fecha).toLocaleDateString('es-CL')
     );
@@ -678,8 +734,8 @@ export class ZonaViewComponent implements OnInit {
   }
   exportarConsumoAgua(): void {
     const datos = this.consumoFiltrado.map((d) => ({
-      'Semana Inicio': d.semana_inicio,
-      'Semana Fin': d.semana_fin,
+      'Semana Inicio': new Date(d.semana_inicio).toLocaleDateString('es-CL'),
+      'Semana Fin': new Date(d.semana_fin).toLocaleDateString('es-CL'),
       'ETo (mm)': d.eto,
       'Precipitación (mm)': d.precipitacion,
       Kc: d.kc,
@@ -717,13 +773,28 @@ export class ZonaViewComponent implements OnInit {
         ?.nombre || 'todas';
     FileSaver.saveAs(
       data,
-      `consumo_agua_${this.zona.nombre}_${temporadaNombre}.xlsx`
+      `recomendacion_riego_${this.zona.nombre}_${temporadaNombre}.xlsx`
     );
+  }
+
+  ejecutarCacheDaily(): void {
+    this.ejecutandoCache = true;
+    this.crawlerService.actualizarCacheDaily().subscribe({
+      next: () => {
+        this.toastr.success('Caché actualizada correctamente');
+        this.ejecutandoCache = false;
+      },
+      error: (err) => {
+        const msg = err?.error?.error || 'Error al actualizar la caché';
+        this.toastr.error(msg);
+        this.ejecutandoCache = false;
+      },
+    });
   }
 
   exportarClima(): void {
     const datos = this.climaFiltrado.map((d) => ({
-      Fecha: d.fecha,
+      Fecha: new Date(d.fecha).toLocaleDateString('es-CL'),
       'Temperatura Mínima (°C)': d.ta_min,
       'Temperatura Máxima (°C)': d.ta_max,
       'Temperatura Promedio (°C)': d.ta_prom,
@@ -755,7 +826,7 @@ export class ZonaViewComponent implements OnInit {
         ?.nombre || 'todas';
     FileSaver.saveAs(
       data,
-      `clima_zona_${this.zona.nombre}_${temporadaNombre}.xlsx`
+      `grados_dia_${this.zona.nombre}_${temporadaNombre}.xlsx`
     );
   }
 
@@ -814,5 +885,390 @@ export class ZonaViewComponent implements OnInit {
       .toISOString()
       .slice(0, 10)}.png`;
     link.click();
+  }
+
+  obtenerEtoConsumoDia(): void {
+    if (!this.zona?.id) return;
+
+    this.zonasService.getEtoConsumoDia(this.zona.id).subscribe({
+      next: (data) => {
+        this.etoConsumoDia = data.sort(
+          (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
+        );
+        const ids = Array.from(
+          new Set(this.etoConsumoDia.map((d) => d.id_temporada))
+        );
+        ids.forEach((id) => {
+          if (this.temporadasVisibles[id] === undefined)
+            this.temporadasVisibles[id] = true;
+        });
+        this.actualizarGraficoEtoConsumo();
+      },
+      error: (err) => console.error('Error al obtener eto_consumo_dia:', err),
+    });
+  }
+
+  actualizarGraficoEtoConsumo(): void {
+    if (!this.etoConsumoDia.length || !this.temporadas.length) {
+      this.chartEtoData = { labels: [], datasets: [] };
+      return;
+    }
+
+    const variable = this.variableSeleccionada;
+    const labels = this.generarLabelsPeriodo();
+
+    const colores = [
+      '#3e95cd',
+      '#156082',
+      '#e97132',
+      '#196b24',
+      '#c45850',
+      '#ff6384',
+    ];
+    const datasets: any[] = [];
+    let idx = 0;
+
+    // Asignar colores a cada temporada si aún no tienen
+    this.temporadas.forEach((temp) => {
+      if (!this.temporadaColores[temp.id!]) {
+        this.temporadaColores[temp.id!] =
+          TEMPORADA_COLORS[temp.nombre] || colores[idx % colores.length];
+        idx++;
+      }
+    });
+    idx = 0;
+
+    this.temporadas.forEach((temp) => {
+      const datosTemp = this.etoConsumoDia
+        .filter((d) => d.id_temporada === temp.id)
+        .map((d) => ({
+          dia: d.fecha.slice(5, 10),
+          valor: (d as any)[variable],
+        }));
+      if (datosTemp.length === 0) return;
+
+      const data: number[] = [];
+      let acc = 0;
+      labels.forEach((lab) => {
+        const encontrado = datosTemp.find((e) => e.dia === lab);
+        if (encontrado) acc += Number(encontrado.valor);
+        data.push(acc);
+      });
+
+      const color = this.temporadaColores[temp.id!];
+      datasets.push({
+        data,
+        label: temp.nombre,
+        borderColor: color,
+        backgroundColor: color + '33',
+        pointBackgroundColor: color,
+        pointBorderColor: color,
+        fill: false,
+        hidden: this.temporadasVisibles[temp.id!] === false,
+      });
+      const ultimoValor = data[data.length - 1];
+      datasets.push({
+        data: new Array(data.length - 1).fill(null).concat(ultimoValor),
+        label: `${temp.nombre} total: ${Math.round(ultimoValor)} mm`,
+        borderColor: 'transparent',
+        backgroundColor: color,
+        pointRadius: 6,
+        pointHoverRadius: 8,
+        pointBackgroundColor: color,
+        fill: false,
+        type: 'line',
+        hidden: this.temporadasVisibles[temp.id!] === false,
+      });
+      idx++;
+    });
+
+    this.chartEtoOptions = {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: true,
+          labels: { usePointStyle: true },
+        },
+        tooltip: {
+              callbacks: {
+                label: (context: any) => {
+                  const valor = context.parsed.y;
+                  return `${Math.round(valor)} mm acumulados`;
+                },
+              },
+            },
+      },
+      scales: {
+        y: { title: { display: true, text: 'mm acumulados' } },
+        x: { title: { display: true, text: 'Día (MM-DD)' } },
+      },
+    };
+
+    this.chartEtoData = { labels, datasets };
+  }
+
+  recalcularConsumosEto(dia: any): void {
+    const calc = this.calcularConsumo(+dia.eto, +dia.kc);
+    dia.consumo_pivote = +calc.consumo_pivote;
+    dia.consumo_cobertura = +calc.consumo_cobertura;
+    dia.consumo_carrete = +calc.consumo_carrete;
+    dia.consumo_aspersor = +calc.consumo_aspersor;
+  }
+
+  cargarEtoSemanal(): void {
+    this.cargandoEto = true;
+    if (!this.zona.estacion_id || !this.zona.estacion_api) {
+      this.toastr.warning('Faltan datos de la estación');
+      this.cargandoEto = false;
+      return;
+    }
+    this.crawlerService
+      .obtenerETo(this.zona.estacion_id, this.zona.estacion_api)
+      .subscribe({
+        next: (data) => {
+          if (!data || !data.fechas) {
+            this.toastr.warning('No se encontraron datos de ETo');
+            this.cargandoEto = false;
+            return;
+          }
+          this.etoSemanalPreview = Object.keys(data.fechas).map((f) => {
+            const valor = +data.fechas[f];
+            const fila: any = {
+              fecha: f,
+              eto: valor,
+              kc: 1,
+            };
+            this.recalcularConsumosEto(fila);
+            return fila;
+          });
+          this.mostrarModalEto = true;
+          this.cargandoEto = false;
+        },
+        error: () => {
+          this.toastr.error('Error al obtener datos de ETo');
+          this.cargandoEto = false;
+        },
+      });
+  }
+
+  guardarEtoSemanal(): void {
+    if (!this.temporadaSeleccionadaId) {
+      this.toastr.warning('Seleccione una temporada');
+      return;
+    }
+    const peticiones = this.etoSemanalPreview.map((dia) => {
+      const datos = {
+        id_zona: this.zona.id,
+        id_temporada: this.temporadaSeleccionadaId!,
+        fecha: dia.fecha,
+        eto: +dia.eto,
+        kc: +dia.kc,
+        consumo_pivote: +dia.consumo_pivote,
+        consumo_cobertura: +dia.consumo_cobertura,
+        consumo_carrete: +dia.consumo_carrete,
+        consumo_aspersor: +dia.consumo_aspersor,
+      } as EtoConsumoDia;
+      return this.zonasService
+        .guardarEtoConsumoDia(this.zona.id, datos)
+        .toPromise();
+    });
+
+    Promise.all(peticiones)
+      .then(() => {
+        this.toastr.success('✅ ETo diario guardado');
+        this.obtenerEtoConsumoDia();
+        this.mostrarModalEto = false;
+      })
+      .catch(() => {
+        this.toastr.error('❌ Error al guardar los datos');
+        this.obtenerEtoConsumoDia();
+        this.mostrarModalEto = false;
+      });
+  }
+
+  agregarFilaEtoManual(): void {
+    this.etoManual.push({ fecha: '', eto: 0, kc: 1 });
+  }
+
+  abrirModalEtoManual(): void {
+    this.mostrarModalEtoManual = true;
+  }
+
+  guardarEtoManual(): void {
+    if (!this.temporadaSeleccionadaId) {
+      this.toastr.warning('Seleccione una temporada');
+      return;
+    }
+    const peticiones = this.etoManual.map((dia) => {
+      this.recalcularConsumosEto(dia);
+      const datos = {
+        id_zona: this.zona.id,
+        id_temporada: this.temporadaSeleccionadaId!,
+        fecha: dia.fecha,
+        eto: +dia.eto,
+        kc: +dia.kc,
+        consumo_pivote: +dia.consumo_pivote!,
+        consumo_cobertura: +dia.consumo_cobertura!,
+        consumo_carrete: +dia.consumo_carrete!,
+        consumo_aspersor: +dia.consumo_aspersor!,
+      } as EtoConsumoDia;
+      return this.zonasService
+        .guardarEtoConsumoDia(this.zona.id, datos)
+        .toPromise();
+    });
+
+    Promise.all(peticiones)
+      .then(() => {
+        this.toastr.success('✅ ETo manual guardado');
+        this.obtenerEtoConsumoDia();
+        this.mostrarModalEtoManual = false;
+        this.etoManual = [{ fecha: '', eto: 0, kc: 1 }];
+      })
+      .catch(() => {
+        this.toastr.error('❌ Error al guardar el ETo');
+      });
+  }
+
+  @ViewChild('graficoEtoCanvas') graficoEtoCanvas!: ElementRef;
+  descargarGraficoEto(): void {
+    const canvas: HTMLCanvasElement = this.graficoEtoCanvas.nativeElement;
+    const imagen = canvas.toDataURL('image/png');
+
+    const link = document.createElement('a');
+    link.href = imagen;
+    link.download = `ETo_${this.zona.nombre}_${
+      this.variableSeleccionada
+    }_${new Date().toISOString().slice(0, 10)}.png`;
+    link.click();
+  }
+
+  private generarLabelsPeriodo(): string[] {
+    const labels: string[] = [];
+    const start = new Date('2000-09-01');
+    const end = new Date('2001-03-23');
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      labels.push(`${month}-${day}`);
+    }
+    return labels;
+  }
+
+  abrirModalEliminarConsumo(): void {
+    this.consumoSeleccionadosIds = [];
+    this.filtroConsumo = '';
+    this.mostrarModalEliminarConsumo = true;
+  }
+
+  abrirModalEliminarClima(): void {
+    this.climaSeleccionadosIds = [];
+    this.filtroClima = '';
+    this.mostrarModalEliminarClima = true;
+  }
+
+  abrirModalEliminarEto(): void {
+    this.etoSeleccionadosIds = [];
+    this.filtroEto = '';
+    this.mostrarModalEliminarEto = true;
+  }
+
+  get consumoBusqueda(): ConsumoAgua[] {
+    const term = this.filtroConsumo.toLowerCase();
+    return this.consumoAgua.filter(
+      (c) => c.semana_inicio.includes(term) || c.semana_fin.includes(term)
+    );
+  }
+
+  get climaBusqueda(): ClimaZona[] {
+    const term = this.filtroClima.toLowerCase();
+    return this.climaZona.filter((c) => c.fecha.includes(term));
+  }
+
+  get etoBusqueda(): EtoConsumoDia[] {
+    const term = this.filtroEto.toLowerCase();
+    return this.etoConsumoDia.filter((e) => e.fecha.includes(term));
+  }
+
+  confirmarEliminarConsumo(): void {
+    if (this.consumoSeleccionadosIds.length === 0) return;
+    Swal.fire({
+      title: '¿Eliminar registros seleccionados?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+    }).then((r) => {
+      if (r.isConfirmed) {
+        const peticiones = this.consumoSeleccionadosIds.map((id) =>
+          firstValueFrom(this.aguaService.eliminarConsumoAgua(id, this.zona.id))
+        );
+        Promise.all(peticiones).then(() => {
+          this.toastr.success('Registros eliminados');
+          this.obtenerConsumoAgua();
+          this.mostrarModalEliminarConsumo = false;
+        });
+      }
+    });
+  }
+
+  confirmarEliminarClima(): void {
+    if (this.climaSeleccionadosIds.length === 0) return;
+    Swal.fire({
+      title: '¿Eliminar registros seleccionados?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+    }).then((r) => {
+      if (r.isConfirmed) {
+        const peticiones = this.climaSeleccionadosIds.map((id) =>
+          firstValueFrom(this.zonasService.eliminarClima(this.zona.id, id))
+        );
+        Promise.all(peticiones).then(() => {
+          this.toastr.success('Registros eliminados');
+          this.obtenerClima();
+          this.mostrarModalEliminarClima = false;
+        });
+      }
+    });
+  }
+
+  confirmarEliminarEto(): void {
+    if (this.etoSeleccionadosIds.length === 0) return;
+    Swal.fire({
+      title: '¿Eliminar registros seleccionados?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+    }).then((r) => {
+      if (r.isConfirmed) {
+        const peticiones = this.etoSeleccionadosIds.map((id) =>
+          firstValueFrom(
+            this.zonasService.eliminarEtoConsumoDia(this.zona.id, id)
+          )
+        );
+        Promise.all(peticiones).then(() => {
+          this.toastr.success('Registros eliminados');
+          this.obtenerEtoConsumoDia();
+          this.mostrarModalEliminarEto = false;
+        });
+      }
+    });
+  }
+
+  onCheckChange(id: number, event: Event, tipo: string): void {
+    const checked = (event.target as HTMLInputElement).checked;
+
+    const lista =
+      tipo === 'consumo'
+        ? this.consumoSeleccionadosIds
+        : tipo === 'clima'
+        ? this.climaSeleccionadosIds
+        : this.etoSeleccionadosIds;
+
+    if (checked) {
+      if (!lista.includes(id)) lista.push(id);
+    } else {
+      const idx = lista.indexOf(id);
+      if (idx > -1) lista.splice(idx, 1);
+    }
   }
 }

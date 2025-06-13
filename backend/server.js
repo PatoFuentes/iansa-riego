@@ -2,8 +2,13 @@ require("dotenv").config();
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
-const { obtenerDatosETo } = require("./crawlerINIA");
-const { obtenerClimaSemanal } = require("./crawlerINIA");
+const {
+  obtenerDatosETo,
+  obtenerClimaSemanal,
+  procesarDatosETo,
+  procesarClimaSemanal,
+} = require("./crawlerINIA");
+const { actualizarCache } = require("./cacheDaily");
 const SALT_ROUNDS = 10;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -16,8 +21,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // Configuración de la base de datos
 
-const dbHost = process.env.DB_HOST || "";
-const dbConfig = process.env.DB_HOST.startsWith("/cloudsql")
+// Si la variable DB_HOST no está definida, asumimos "localhost" para
+// evitar fallos de conexión en desarrollo.
+const dbHost = process.env.DB_HOST || "localhost";
+const dbConfig = dbHost.startsWith("/cloudsql")
   ? {
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
@@ -47,6 +54,24 @@ db.connect((err) => {
     });
   }
 });
+
+function leerCache(tipo) {
+  return new Promise((resolve) => {
+    const sql =
+      "SELECT json_data FROM crawler_cache WHERE fecha = CURDATE() AND tipo = ?";
+    db.query(sql, [tipo], (err, rows) => {
+      if (err || rows.length === 0) return resolve(null);
+      try {
+        const data = typeof rows[0].json_data === "string"
+          ? JSON.parse(rows[0].json_data)
+          : rows[0].json_data;
+        resolve(data);
+      } catch {
+        resolve(null);
+      }
+    });
+  });
+}
 
 // Middleware para proteger rutas enteras
 app.use("/usuarios", authMiddleware);
@@ -478,6 +503,17 @@ app.put("/zonas/:id", authMiddleware, (req, res) => {
 
 // Información desde INIA
 
+// Ejecutar la actualización diaria de caché manualmente
+app.post('/api/cache-daily', async (_req, res) => {
+  try {
+    await actualizarCache();
+    res.json({ message: 'Caché actualizada' });
+  } catch (err) {
+    console.error('❌ Error al actualizar caché:', err);
+    res.status(500).json({ error: err.message || 'Error al actualizar caché' });
+  }
+});
+
 // Endpoint para obtener datos ETo desde estación
 app.get("/api/eto", async (req, res) => {
   const { estacion_id, estacion_api } = req.query;
@@ -489,7 +525,20 @@ app.get("/api/eto", async (req, res) => {
   }
 
   try {
-    const resultado = await obtenerDatosETo(estacion_id, estacion_api);
+    const jsonEto = await leerCache("items-ET");
+    const jsonResumen = await leerCache("items-resumen");
+    let resultado = null;
+    if (jsonEto && jsonResumen) {
+      resultado = procesarDatosETo(
+        jsonEto,
+        jsonResumen,
+        estacion_id,
+        estacion_api
+      );
+    }
+    if (!resultado) {
+      resultado = await obtenerDatosETo(estacion_id, estacion_api);
+    }
     res.json(resultado);
   } catch (error) {
     console.error("❌ Error al obtener datos ETo:", error);
@@ -521,8 +570,8 @@ function redondearEntero(valor) {
   return Math.round(valor);
 }
 // Registrar consumo de agua en una zona
-app.post("/zonas/:id/consumo-agua", (req, res) => {
-  const { id } = req.params;
+app.post("/zonas/:zonaId/consumo-agua", (req, res) => {
+  const { zonaId } = req.params;
   const {
     semana_inicio,
     semana_fin,
@@ -545,7 +594,7 @@ app.post("/zonas/:id/consumo-agua", (req, res) => {
   db.query(
     sql,
     [
-      id,
+      zonaId,
       semana_inicio,
       semana_fin,
       redondearEntero(eto),
@@ -575,8 +624,8 @@ app.post("/zonas/:id/consumo-agua", (req, res) => {
 });
 
 // Editar consumo de agua por ID
-app.put("/zonas/:id/consumo-agua/:id", (req, res) => {
-  const { id } = req.params;
+app.put("/zonas/:zonaId/consumo-agua/:consumoId", (req, res) => {
+  const { zonaId, consumoId } = req.params;
   const {
     semana_inicio,
     semana_fin,
@@ -613,7 +662,7 @@ app.put("/zonas/:id/consumo-agua/:id", (req, res) => {
       redondearEntero(consumo_carrete),
       redondearEntero(consumo_aspersor),
       id_temporada,
-      id,
+      consumoId,
     ],
     (err, result) => {
       if (err) {
@@ -631,12 +680,12 @@ app.put("/zonas/:id/consumo-agua/:id", (req, res) => {
 });
 
 // Eliminar consumo de agua por ID
-app.delete("/zonas/:id/consumo-agua/:id", (req, res) => {
-  const { id } = req.params;
+app.delete("/zonas/:zonaId/consumo-agua/:consumoId", (req, res) => {
+  const { zonaId, consumoId } = req.params;
 
   const sql = "DELETE FROM consumo_agua WHERE id = ?";
 
-  db.query(sql, [id], (err, result) => {
+  db.query(sql, [consumoId], (err, result) => {
     if (err) {
       console.error("❌ Error al eliminar consumo de agua:", err);
       return res
@@ -647,6 +696,109 @@ app.delete("/zonas/:id/consumo-agua/:id", (req, res) => {
     res
       .status(200)
       .json({ message: "Consumo de agua eliminado correctamente" });
+  });
+});
+
+// Obtener datos de eto y consumo diario por zona
+app.get("/zonas/:zonaId/eto-consumo-dia", (req, res) => {
+  const { zonaId } = req.params;
+  const sql =
+    "SELECT * FROM eto_consumo_dia WHERE id_zona = ? ORDER BY fecha ASC";
+
+  db.query(sql, [zonaId], (err, results) => {
+    if (err) {
+      console.error("Error al obtener datos eto_consumo_dia:", err);
+      return res
+        .status(500)
+        .json({ error: "Error al obtener datos eto_consumo_dia" });
+    }
+
+    res.json(results);
+  });
+});
+
+  // Registrar eto y consumos diarios de una zona
+  app.post("/zonas/:zonaId/eto-consumo-dia", (req, res) => {
+  const { zonaId } = req.params;
+  const {
+    fecha,
+    eto,
+    kc,
+    consumo_pivote,
+    consumo_cobertura,
+    consumo_carrete,
+    consumo_aspersor,
+    id_temporada,
+  } = req.body;
+
+  const checkSql =
+    "SELECT 1 FROM eto_consumo_dia WHERE id_zona = ? AND fecha = ?";
+
+  db.query(checkSql, [zonaId, fecha], (err, rows) => {
+    if (err) {
+      console.error("❌ Error al verificar eto_consumo_dia:", err);
+      return res
+        .status(500)
+        .json({ error: "Error al verificar eto_consumo_dia" });
+    }
+
+    if (rows.length > 0) {
+      return res
+        .status(409)
+        .json({ message: "Ya existe registro para esta fecha" });
+    }
+
+    const insertSql = `
+        INSERT INTO eto_consumo_dia
+        (id_zona, id_temporada, fecha, eto, kc, consumo_pivote, consumo_cobertura, consumo_carrete, consumo_aspersor)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+
+    db.query(
+      insertSql,
+      [
+        zonaId,
+        id_temporada,
+        fecha,
+        redondearEntero(eto),
+        kc,
+        redondearEntero(consumo_pivote),
+        redondearEntero(consumo_cobertura),
+        redondearEntero(consumo_carrete),
+        redondearEntero(consumo_aspersor),
+      ],
+      (err, result) => {
+        if (err) {
+          console.error("❌ Error al registrar eto_consumo_dia:", err);
+          return res
+            .status(500)
+            .json({ error: "Error al registrar eto_consumo_dia" });
+        }
+
+        res.status(201).json({
+          message: "ETo diario registrado correctamente",
+          id: result.insertId,
+        });
+      }
+    );
+  });
+
+  // Eliminar registro de ETo diario
+  app.delete("/zonas/:zonaId/eto-consumo-dia/:id", (req, res) => {
+    const { zonaId, id } = req.params;
+    const sql =
+      "DELETE FROM eto_consumo_dia WHERE id_eto_dia = ? AND id_zona = ?";
+
+    db.query(sql, [id, zonaId], (err) => {
+      if (err) {
+        console.error("❌ Error al eliminar eto_consumo_dia:", err);
+        return res
+          .status(500)
+          .json({ error: "Error al eliminar eto_consumo_dia" });
+      }
+
+      res.json({ message: "ETo diario eliminado correctamente" });
+    });
   });
 });
 
@@ -678,7 +830,18 @@ app.get("/api/clima-semanal", async (req, res) => {
   }
 
   try {
-    const datos = await obtenerClimaSemanal(estacion_id, estacion_api);
+    const jsonResumen = await leerCache("items-resumen");
+    let datos = null;
+    if (jsonResumen) {
+      datos = procesarClimaSemanal(
+        jsonResumen,
+        estacion_id,
+        estacion_api
+      );
+    }
+    if (!datos || datos.length === 0) {
+      datos = await obtenerClimaSemanal(estacion_id, estacion_api);
+    }
     if (!datos || datos.length === 0) {
       return res
         .status(404)
@@ -759,6 +922,21 @@ app.post("/zonas/:id/clima-semanal", (req, res) => {
         });
       }
     );
+  });
+});
+
+// Eliminar clima semanal por ID
+app.delete("/zonas/:zonaId/clima-semanal/:climaId", (req, res) => {
+  const { zonaId, climaId } = req.params;
+  const sql = "DELETE FROM clima_dia WHERE id = ? AND id_zona = ?";
+
+  db.query(sql, [climaId, zonaId], (err) => {
+    if (err) {
+      console.error("❌ Error al eliminar clima:", err);
+      return res.status(500).json({ error: "Error al eliminar clima" });
+    }
+
+    res.json({ message: "Clima eliminado correctamente" });
   });
 });
 
