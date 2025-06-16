@@ -221,10 +221,21 @@
         [ngClass]="mostrarGrafico ? 'fa-chevron-up' : 'fa-chevron-down'"
       ></i>
     </div>
-    <div class="card-body text-end" *ngIf="mostrarGrafico">
-      <button class="btn btn-outline-success mb-3" (click)="descargarGrafico()">
-        Descargar Gráfico
-      </button>
+    <div class="card-body" *ngIf="mostrarGrafico">
+      <div class="d-flex justify-content-between flex-wrap mb-3">
+        <div class="me-2">
+          <label class="form-label mb-1">Acumular desde</label>
+          <input
+            type="date"
+            class="form-control"
+            [(ngModel)]="fechaInicioGradosDia"
+            (change)="actualizarGraficoGradosDia()"
+          />
+        </div>
+        <button class="btn btn-outline-success align-self-end" (click)="descargarGrafico()">
+          Descargar Gráfico
+        </button>
+      </div>
       <canvas
         #graficoCanvas
         baseChart
