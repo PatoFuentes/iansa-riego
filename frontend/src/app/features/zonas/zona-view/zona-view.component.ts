@@ -84,6 +84,7 @@ export class ZonaViewComponent implements OnInit {
   consumoSeleccionado: ConsumoAgua | null = null;
   temporadas: Temporada[] = [];
   temporadaSeleccionadaId: number | null = null;
+  fechaInicioGradosDia: string | null = null;
   chartData: ChartData<'line'> = {
     labels: [],
     datasets: [],
@@ -650,10 +651,11 @@ export class ZonaViewComponent implements OnInit {
               pointHoverRadius: 8,
               pointBackgroundColor: 'red',
               fill: false,
-              type: 'line',
-            },
-          ],
+            type: 'line',
+          },
+        ],
         };
+        this.actualizarGraficoGradosDia();
       },
       error: (err) => {
         console.error('Error al obtener información de clima:', err);
@@ -684,6 +686,11 @@ export class ZonaViewComponent implements OnInit {
   actualizarGraficoGradosDia(): void {
     const datos = this.climaFiltrado
       .filter((d) => d.grados_dia != null)
+      .filter(
+        (d) =>
+          !this.fechaInicioGradosDia ||
+          new Date(d.fecha) >= new Date(this.fechaInicioGradosDia)
+      )
       .sort(
         (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
       );
