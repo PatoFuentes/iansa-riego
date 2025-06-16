@@ -221,10 +221,31 @@
         [ngClass]="mostrarGrafico ? 'fa-chevron-up' : 'fa-chevron-down'"
       ></i>
     </div>
-    <div class="card-body text-end" *ngIf="mostrarGrafico">
-      <button class="btn btn-outline-success mb-3" (click)="descargarGrafico()">
-        Descargar Gráfico
-      </button>
+    <div class="card-body" *ngIf="mostrarGrafico">
+      <div class="text-end mb-3">
+        <button class="btn btn-outline-success" (click)="descargarGrafico()">
+          Descargar Gráfico
+        </button>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Temporadas</label>
+          <div *ngFor="let temp of temporadas">
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [id]="'gdaTemp' + temp.id!"
+                [(ngModel)]="temporadasGdaVisibles[temp.id!]"
+                (change)="actualizarGraficoGradosDia()"
+              />
+              <label class="form-check-label" [for]="'gdaTemp' + temp.id">
+                {{ temp.nombre }}
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
       <canvas
         #graficoCanvas
         baseChart

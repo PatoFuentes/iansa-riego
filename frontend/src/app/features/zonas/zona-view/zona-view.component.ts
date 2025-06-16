@@ -104,6 +104,7 @@ export class ZonaViewComponent implements OnInit {
   etoConsumoDia: EtoConsumoDia[] = [];
   variableSeleccionada: string = 'eto';
   temporadasVisibles: Record<number, boolean> = {};
+  temporadasGdaVisibles: Record<number, boolean> = {};
   temporadaColores: Record<number, string> = {};
   chartEtoData: ChartData<'line'> = { labels: [], datasets: [] };
   chartEtoOptions: any;
@@ -573,31 +574,24 @@ export class ZonaViewComponent implements OnInit {
             (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
           );
 
-        const labels = this.climaZona.map((d) =>
-          new Date(d.fecha).toLocaleDateString('es-CL')
+        const ids = Array.from(
+          new Set(this.climaZona.map((d) => d.id_temporada))
         );
-        const gradosDiaAcumulado: number[] = [];
-        let suma = 0;
+        ids.forEach((id) => {
+          if (id != null && this.temporadasGdaVisibles[id] === undefined) {
+            this.temporadasGdaVisibles[id] = true;
+          }
+        });
 
-        for (const dia of this.climaZona) {
-          const grados = parseFloat(dia.grados_dia?.toString() || '0');
-          suma += isNaN(grados) ? 0 : grados;
-          gradosDiaAcumulado.push(suma);
-        }
-
-        const ultimoValor = gradosDiaAcumulado[gradosDiaAcumulado.length - 1];
-        const ultimaFecha = labels[labels.length - 1];
-
-        // 🔧 Ahora generas dinámicamente las opciones con el valor
         this.chartOptions = {
           responsive: true,
           plugins: {
-            legend: { display: true },
+            legend: { display: true, labels: { usePointStyle: true } },
             tooltip: {
               callbacks: {
                 label: (context: any) => {
                   const valor = context.parsed.y;
-                  return `${Math.round(valor)} grados acumulados`;
+                  return `${Math.round(valor)} GDA acumulados`;
                 },
               },
             },
@@ -607,53 +601,13 @@ export class ZonaViewComponent implements OnInit {
               title: {
                 display: true,
                 text: 'GDA (°C) (T Base 3)',
-                font: {
-                  size: 14,
-                  weight: 'bold' as const,
-                },
               },
             },
-            x: {
-              title: {
-                display: true,
-                text: 'Fecha',
-                font: {
-                  size: 14,
-                  weight: 'bold' as const,
-                },
-              },
-            },
+            x: { title: { display: true, text: 'Día (MM-DD)' } },
           },
         };
 
-        // Finalmente actualizas los datos del gráfico
-        this.chartData = {
-          labels,
-          datasets: [
-            {
-              data: gradosDiaAcumulado,
-              label: 'Grados Día',
-              borderColor: 'green',
-              backgroundColor: 'rgba(0, 128, 0, 0.2)',
-              fill: true,
-              tension: 0.3,
-              pointRadius: 3,
-            },
-            {
-              data: new Array(gradosDiaAcumulado.length - 1)
-                .fill(null)
-                .concat(ultimoValor),
-              label: `Total acumulado: ${Math.round(ultimoValor)} GDA`,
-              borderColor: 'transparent',
-              backgroundColor: 'red',
-              pointRadius: 6,
-              pointHoverRadius: 8,
-              pointBackgroundColor: 'red',
-              fill: false,
-              type: 'line',
-            },
-          ],
-        };
+        this.actualizarGraficoGradosDia();
       },
       error: (err) => {
         console.error('Error al obtener información de clima:', err);
@@ -682,55 +636,78 @@ export class ZonaViewComponent implements OnInit {
   }
 
   actualizarGraficoGradosDia(): void {
-    const datos = this.climaFiltrado
-      .filter((d) => d.grados_dia != null)
-      .sort(
-        (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
-      );
-
-    if (datos.length === 0) {
+    if (!this.climaZona.length || !this.temporadas.length) {
       this.chartData = { labels: [], datasets: [] };
-      return; // evita errores por arreglo vacío
+      return;
     }
 
-    const labels = datos.map((d) =>
-      new Date(d.fecha).toLocaleDateString('es-CL')
-    );
-    const gradosDiaAcumulado: number[] = [];
-    let suma = 0;
-    for (const dia of datos) {
-      const grados = parseFloat(dia.grados_dia?.toString() || '0');
-      suma += isNaN(grados) ? 0 : grados;
-      gradosDiaAcumulado.push(suma);
-    }
-    const ultimoValor = gradosDiaAcumulado[gradosDiaAcumulado.length - 1];
+    const labels = this.generarLabelsPeriodo();
+    const colores = [
+      '#3e95cd',
+      '#156082',
+      '#e97132',
+      '#196b24',
+      '#c45850',
+      '#ff6384',
+    ];
+    const datasets: any[] = [];
+    let idx = 0;
 
-    this.chartData = {
-      labels,
-      datasets: [
-        {
-          data: gradosDiaAcumulado,
-          label: 'Grados Día Acumulados',
-          borderColor: 'green',
-          backgroundColor: 'rgba(0, 128, 0, 0.2)',
-          fill: true,
-          tension: 0.3,
-        },
-        {
-          data: new Array(gradosDiaAcumulado.length - 1)
-            .fill(null)
-            .concat(ultimoValor),
-          label: `Total acumulado: ${Math.round(ultimoValor)} GDA`,
-          borderColor: 'transparent',
-          backgroundColor: 'red',
-          pointRadius: 6,
-          pointHoverRadius: 8,
-          pointBackgroundColor: 'red',
-          fill: false,
-          type: 'line',
-        },
-      ],
-    };
+    // Asignar colores a cada temporada si aún no tienen
+    this.temporadas.forEach((temp) => {
+      if (!this.temporadaColores[temp.id!]) {
+        this.temporadaColores[temp.id!] =
+          TEMPORADA_COLORS[temp.nombre] || colores[idx % colores.length];
+        idx++;
+      }
+    });
+    idx = 0;
+
+    this.temporadas.forEach((temp) => {
+      const datosTemp = this.climaZona
+        .filter((d) => d.id_temporada === temp.id)
+        .map((d) => ({
+          dia: d.fecha.slice(5, 10),
+          valor: d.grados_dia ?? 0,
+        }));
+      if (datosTemp.length === 0) return;
+
+      const data: number[] = [];
+      let acc = 0;
+      labels.forEach((lab) => {
+        const encontrado = datosTemp.find((e) => e.dia === lab);
+        if (encontrado) acc += Number(encontrado.valor);
+        data.push(acc);
+      });
+
+      const color = this.temporadaColores[temp.id!];
+      datasets.push({
+        data,
+        label: temp.nombre,
+        borderColor: color,
+        backgroundColor: color + '33',
+        pointBackgroundColor: color,
+        pointBorderColor: color,
+        fill: false,
+        hidden: this.temporadasGdaVisibles[temp.id!] === false,
+      });
+      const ultimoValor = data[data.length - 1];
+      datasets.push({
+        data: new Array(data.length - 1).fill(null).concat(ultimoValor),
+        label: `${temp.nombre} total: ${Math.round(ultimoValor)} GDA`,
+        borderColor: 'transparent',
+        backgroundColor: color,
+        pointRadius: 6,
+        pointHoverRadius: 8,
+        pointBackgroundColor: color,
+        fill: false,
+        type: 'line',
+        hidden: this.temporadasGdaVisibles[temp.id!] === false,
+      });
+      idx++;
+    });
+
+    this.chartData = { labels, datasets };
   }
   exportarConsumoAgua(): void {
     const datos = this.consumoFiltrado.map((d) => ({
