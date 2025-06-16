@@ -110,6 +110,12 @@ export class ZonaViewComponent implements OnInit {
   chartEtoOptions: any;
   mostrarGraficoEto: boolean = false;
 
+  // Datos para gráfico de grados acumulados por temporada
+  chartGdaTempData: ChartData<'line'> = { labels: [], datasets: [] };
+  chartGdaTempOptions: any;
+  mostrarGraficoGdaTemp: boolean = false;
+  fechaInicioGdaTemp: string | null = null;
+
   // Admin: carga y registro de ETo diario
   cargandoEto: boolean = false;
   mostrarModalEto = false;
@@ -164,6 +170,7 @@ export class ZonaViewComponent implements OnInit {
                 a.nombre.localeCompare(b.nombre)
               );
               this.actualizarGraficoEtoConsumo();
+              this.actualizarGraficoGdaTemporadas();
             },
             error: () => this.toastr.error('Error al cargar temporadas'),
           });
@@ -656,6 +663,7 @@ export class ZonaViewComponent implements OnInit {
         ],
         };
         this.actualizarGraficoGradosDia();
+        this.actualizarGraficoGdaTemporadas();
       },
       error: (err) => {
         console.error('Error al obtener información de clima:', err);
@@ -1137,6 +1145,7 @@ export class ZonaViewComponent implements OnInit {
   }
 
   @ViewChild('graficoEtoCanvas') graficoEtoCanvas!: ElementRef;
+  @ViewChild('graficoGdaTempCanvas') graficoGdaTempCanvas!: ElementRef;
   descargarGraficoEto(): void {
     const canvas: HTMLCanvasElement = this.graficoEtoCanvas.nativeElement;
     const imagen = canvas.toDataURL('image/png');
@@ -1147,6 +1156,123 @@ export class ZonaViewComponent implements OnInit {
       this.variableSeleccionada
     }_${new Date().toISOString().slice(0, 10)}.png`;
     link.click();
+  }
+
+  actualizarGraficoGdaTemporadas(): void {
+    if (!this.climaZona.length || !this.temporadas.length) {
+      this.chartGdaTempData = { labels: [], datasets: [] };
+      return;
+    }
+
+    const labels = this.generarLabelsDesde(
+      this.fechaInicioGdaTemp || '08-15'
+    );
+
+    const colores = [
+      '#3e95cd',
+      '#156082',
+      '#e97132',
+      '#196b24',
+      '#c45850',
+      '#ff6384',
+    ];
+    const datasets: any[] = [];
+    let idx = 0;
+
+    this.temporadas.forEach((temp) => {
+      if (!this.temporadaColores[temp.id!]) {
+        this.temporadaColores[temp.id!] =
+          TEMPORADA_COLORS[temp.nombre] || colores[idx % colores.length];
+        idx++;
+      }
+    });
+    idx = 0;
+
+    this.temporadas.forEach((temp) => {
+      const datosTemp = this.climaZona
+        .filter((d) => d.id_temporada === temp.id)
+        .filter((d) => {
+          if (!this.fechaInicioGdaTemp) return true;
+          const base = `${d.fecha.slice(0, 4)}-${this.fechaInicioGdaTemp}`;
+          return new Date(d.fecha) >= new Date(base);
+        })
+        .map((d) => ({ dia: d.fecha.slice(5, 10), valor: d.grados_dia || 0 }));
+      if (datosTemp.length === 0) return;
+
+      const data: number[] = [];
+      let acc = 0;
+      labels.forEach((lab) => {
+        const encontrado = datosTemp.find((e) => e.dia === lab);
+        if (encontrado) acc += Number(encontrado.valor);
+        data.push(acc);
+      });
+
+      const color = this.temporadaColores[temp.id!];
+      datasets.push({
+        data,
+        label: temp.nombre,
+        borderColor: color,
+        backgroundColor: color + '33',
+        pointBackgroundColor: color,
+        pointBorderColor: color,
+        fill: false,
+        hidden: this.temporadasVisibles[temp.id!] === false,
+      });
+      const ultimoValor = data[data.length - 1];
+      datasets.push({
+        data: new Array(data.length - 1).fill(null).concat(ultimoValor),
+        label: `${temp.nombre} total: ${Math.round(ultimoValor)} GDA`,
+        borderColor: 'transparent',
+        backgroundColor: color,
+        pointRadius: 6,
+        pointHoverRadius: 8,
+        pointBackgroundColor: color,
+        fill: false,
+        type: 'line',
+        hidden: this.temporadasVisibles[temp.id!] === false,
+      });
+      idx++;
+    });
+
+    this.chartGdaTempOptions = {
+      responsive: true,
+      plugins: {
+        legend: { labels: { usePointStyle: true } },
+        tooltip: {
+          callbacks: {
+            label: (context: any) => {
+              const valor = context.parsed.y;
+              return `${Math.round(valor)} GDA`;
+            },
+          },
+        },
+      },
+      scales: {
+        y: { title: { display: true, text: 'GDA acumulados' } },
+        x: { title: { display: true, text: 'Día (MM-DD)' } },
+      },
+    };
+
+    this.chartGdaTempData = { labels, datasets };
+  }
+
+  seleccionarFechaGda(fecha: string): void {
+    this.fechaInicioGdaTemp =
+      this.fechaInicioGdaTemp === fecha ? null : fecha;
+    this.actualizarGraficoGdaTemporadas();
+  }
+
+  private generarLabelsDesde(md: string): string[] {
+    const labels: string[] = [];
+    const start = new Date(`2000-${md}`);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 203);
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      labels.push(`${month}-${day}`);
+    }
+    return labels;
   }
 
   private generarLabelsPeriodo(): string[] {

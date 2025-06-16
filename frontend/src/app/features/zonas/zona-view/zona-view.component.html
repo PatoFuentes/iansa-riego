@@ -246,6 +246,74 @@
     </div>
   </div>
 
+  <!-- 📈 Sección: Grados Acumulados Temporadas -->
+  <div class="card shadow-sm border-dark mb-4">
+    <div
+      class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+      style="cursor: pointer"
+      (click)="mostrarGraficoGdaTemp = !mostrarGraficoGdaTemp"
+    >
+      <h5 class="mb-0">Grados Acumulados Temporadas</h5>
+      <i
+        class="fas"
+        [ngClass]="mostrarGraficoGdaTemp ? 'fa-chevron-up' : 'fa-chevron-down'"
+      ></i>
+    </div>
+    <div class="card-body" *ngIf="mostrarGraficoGdaTemp">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Filtrar desde</label>
+          <div>
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="fechaAgo"
+                (change)="seleccionarFechaGda('08-15')"
+                [checked]="fechaInicioGdaTemp === '08-15'"
+              />
+              <label class="form-check-label" for="fechaAgo">15 agosto</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="fechaSep"
+                (change)="seleccionarFechaGda('09-15')"
+                [checked]="fechaInicioGdaTemp === '09-15'"
+              />
+              <label class="form-check-label" for="fechaSep">15 septiembre</label>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Temporadas</label>
+          <div *ngFor="let temp of temporadas">
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [id]="'gdaTemp' + temp.id!"
+                [(ngModel)]="temporadasVisibles[temp.id!]"
+                (change)="actualizarGraficoGdaTemporadas()"
+              />
+              <label class="form-check-label" [for]="'gdaTemp' + temp.id">
+                {{ temp.nombre }}
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <canvas
+        baseChart
+        #graficoGdaTempCanvas
+        [data]="chartGdaTempData"
+        [options]="chartGdaTempOptions"
+        [type]="'line'"
+      ></canvas>
+    </div>
+  </div>
+
   <!-- 📊 Sección: Consumos Temporadas -->
   <div class="card shadow-sm border-dark mb-4">
     <div
