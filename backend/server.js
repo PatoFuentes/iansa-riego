@@ -49,8 +49,8 @@ db.connect((err) => {
     console.log("✅ Conectado a la base de datos MySQL");
 
     const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-      console.log(`Servidor corriendo en http://localhost:${PORT}`);
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Servidor corriendo en puerto ${PORT}`);
     });
   }
 });
@@ -62,9 +62,10 @@ function leerCache(tipo) {
     db.query(sql, [tipo], (err, rows) => {
       if (err || rows.length === 0) return resolve(null);
       try {
-        const data = typeof rows[0].json_data === "string"
-          ? JSON.parse(rows[0].json_data)
-          : rows[0].json_data;
+        const data =
+          typeof rows[0].json_data === "string"
+            ? JSON.parse(rows[0].json_data)
+            : rows[0].json_data;
         resolve(data);
       } catch {
         resolve(null);
@@ -504,13 +505,13 @@ app.put("/zonas/:id", authMiddleware, (req, res) => {
 // Información desde INIA
 
 // Ejecutar la actualización diaria de caché manualmente
-app.post('/api/cache-daily', async (_req, res) => {
+app.post("/api/cache-daily", async (_req, res) => {
   try {
     await actualizarCache();
-    res.json({ message: 'Caché actualizada' });
+    res.json({ message: "Caché actualizada" });
   } catch (err) {
-    console.error('❌ Error al actualizar caché:', err);
-    res.status(500).json({ error: err.message || 'Error al actualizar caché' });
+    console.error("❌ Error al actualizar caché:", err);
+    res.status(500).json({ error: err.message || "Error al actualizar caché" });
   }
 });
 
@@ -717,8 +718,8 @@ app.get("/zonas/:zonaId/eto-consumo-dia", (req, res) => {
   });
 });
 
-  // Registrar eto y consumos diarios de una zona
-  app.post("/zonas/:zonaId/eto-consumo-dia", (req, res) => {
+// Registrar eto y consumos diarios de una zona
+app.post("/zonas/:zonaId/eto-consumo-dia", (req, res) => {
   const { zonaId } = req.params;
   const {
     fecha,
@@ -833,11 +834,7 @@ app.get("/api/clima-semanal", async (req, res) => {
     const jsonResumen = await leerCache("items-resumen");
     let datos = null;
     if (jsonResumen) {
-      datos = procesarClimaSemanal(
-        jsonResumen,
-        estacion_id,
-        estacion_api
-      );
+      datos = procesarClimaSemanal(jsonResumen, estacion_id, estacion_api);
     }
     if (!datos || datos.length === 0) {
       datos = await obtenerClimaSemanal(estacion_id, estacion_api);
