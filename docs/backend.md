@@ -74,6 +74,18 @@ CMD ["node", "server.js"]
 - Usa variables de entorno definidas en el entorno de ejecución.
 - Se construye y despliega desde `cloudbuild.yaml`.
 
+### Conectar Cloud Run a Cloud SQL
+
+Habilita la conexión con tu instancia de Cloud SQL desde la configuración del
+servicio en la consola de Cloud Run o con el comando:
+
+```bash
+gcloud run deploy --add-cloudsql-instances=INSTANCIA
+```
+
+De lo contrario el directorio `/cloudsql/...` no estará disponible en el
+contenedor y la aplicación terminará antes de comenzar a escuchar.
+
 ---
 
 ¿Preguntas sobre el backend? Puedes revisarlo en `server.js` y `crawlerINIA.js`.
