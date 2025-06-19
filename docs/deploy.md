@@ -79,6 +79,20 @@ on:
 - El contenedor debe escuchar en el puerto especificado por la variable `PORT` (por defecto 8080).
 - Las variables de entorno del backend se configuran directamente en la consola de Cloud Run.
 
+## 🔗 Conectar Cloud Run a Cloud SQL
+
+Para que el backend se comunique con la base de datos es necesario habilitar
+la conexión de **Cloud SQL** en el servicio de Cloud Run. Esto puede hacerse en
+la consola marcando la opción correspondiente o ejecutando:
+
+```bash
+gcloud run deploy --add-cloudsql-instances=INSTANCIA
+```
+
+Sin esta configuración no se creará el directorio de sockets
+`/cloudsql/...` dentro del contenedor y la aplicación se cerrará antes de
+escuchar peticiones.
+
 ---
 
 ## 🧪 Pruebas Automatizadas
