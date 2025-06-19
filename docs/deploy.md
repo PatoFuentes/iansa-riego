@@ -76,7 +76,7 @@ on:
 ## ☁️ Configuraciones Relevantes
 
 - Cada microservicio (frontend y backend) tiene su propia imagen Docker.
-- El backend escucha en `PORT=3000`, pero Cloud Run lo redirige a `8080`.
+- El contenedor debe escuchar en el puerto especificado por la variable `PORT` (por defecto 8080).
 - Las variables de entorno del backend se configuran directamente en la consola de Cloud Run.
 
 ---

@@ -70,7 +70,7 @@ npm run start
 
 ### Acceso:
 - Frontend: `http://localhost:4200`
-- Backend API: `http://localhost:3000`
+- Backend API: `http://localhost:8080`
 
 ---
 
@@ -126,7 +126,7 @@ DB_HOST=/cloudsql/id-pagina-riego:us-central1:id-bd-riego
 DB_USER=root
 DB_PASSWORD=tu_clave
 DB_NAME=iansa_riego
-PORT=3000
+PORT=8080
 ```
 
 ---

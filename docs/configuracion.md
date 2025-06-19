@@ -13,7 +13,7 @@ DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=*****
 DB_NAME=iansa_riego
-PORT=3000
+PORT=8080
 JWT_SECRET=mi_clave_secreta_segura
 ET_URL=https://agrometeorologia.cl/evapotranspiracion/
 RESUMEN_URL=https://agrometeorologia.cl/
@@ -29,7 +29,7 @@ RESUMEN_URL=https://agrometeorologia.cl/
 ```ts
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000'
+  apiUrl: 'http://localhost:8080'
 };
 ```
 

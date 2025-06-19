@@ -48,7 +48,7 @@ DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=
 DB_NAME=iansa_riego
-PORT=3000
+PORT=8080
 ```
 
 ---
@@ -60,7 +60,7 @@ FROM node:22
 WORKDIR /app
 COPY . .
 RUN npm install
-EXPOSE 3000
+EXPOSE 8080
 CMD ["node", "server.js"]
 ```
 
@@ -70,7 +70,7 @@ CMD ["node", "server.js"]
 
 ## ☁️ Despliegue en Cloud Run
 
-- Expone el backend en el puerto `3000`, mapeado automáticamente a `8080` por Cloud Run.
+- El contenedor debe exponer el backend en el puerto definido por `PORT` (por defecto `8080`).
 - Usa variables de entorno definidas en el entorno de ejecución.
 - Se construye y despliega desde `cloudbuild.yaml`.
 
