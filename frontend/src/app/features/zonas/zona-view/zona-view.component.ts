@@ -1192,9 +1192,13 @@ export class ZonaViewComponent implements OnInit {
       const datosTemp = this.climaZona
         .filter((d) => d.id_temporada === temp.id)
         .filter((d) => {
-          if (!this.fechaInicioGdaTemp) return true;
-          const base = `${d.fecha.slice(0, 4)}-${this.fechaInicioGdaTemp}`;
-          return new Date(d.fecha) >= new Date(base);
+          const md = this.fechaInicioGdaTemp || '08-15';
+          const year = new Date(temp.fecha_inicio).getFullYear();
+          const inicio = new Date(`${year}-${md}`);
+          const fin = new Date(inicio);
+          fin.setDate(fin.getDate() + 244); // 244 días de la temporada
+          const fecha = new Date(d.fecha);
+          return fecha >= inicio && fecha <= fin;
         })
         .map((d) => ({ dia: d.fecha.slice(5, 10), valor: d.grados_dia || 0 }));
       if (datosTemp.length === 0) return;
@@ -1266,7 +1270,7 @@ export class ZonaViewComponent implements OnInit {
     const labels: string[] = [];
     const start = new Date(`2000-${md}`);
     const end = new Date(start);
-    end.setDate(end.getDate() + 203);
+    end.setDate(end.getDate() + 244);
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
       const month = String(d.getMonth() + 1).padStart(2, '0');
       const day = String(d.getDate()).padStart(2, '0');
