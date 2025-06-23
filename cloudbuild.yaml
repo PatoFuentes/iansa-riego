@@ -22,7 +22,7 @@ steps:
     args: [
       'run', 'deploy', 'backend-riego',
       '--image', 'gcr.io/demanda-riego-461720/backend-riego',
-      '--region', 'us-central1',
+      '--region', 'southamerica-west1',
       '--platform', 'managed',
       '--allow-unauthenticated'
     ]
@@ -50,7 +50,7 @@ steps:
     args: [
       'run', 'deploy', 'frontend-riego',
       '--image', 'gcr.io/demanda-riego-461720/frontend-riego',
-      '--region', 'us-central1',
+      '--region', 'southamerica-west1',
       '--platform', 'managed',
       '--allow-unauthenticated'
     ]
