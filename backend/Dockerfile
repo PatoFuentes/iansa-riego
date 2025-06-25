@@ -14,7 +14,7 @@ RUN npm install
 RUN mkdir -p /cloudsql
 
 # 6. Expone el puerto que usará tu backend (usa el mismo que en tu server.js)
-EXPOSE 8080
+EXPOSE 3306
 
 # 7. Comando para arrancar la app
 CMD ["node", "server.js"]
