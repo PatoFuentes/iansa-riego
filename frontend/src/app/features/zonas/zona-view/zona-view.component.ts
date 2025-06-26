@@ -1195,8 +1195,7 @@ export class ZonaViewComponent implements OnInit {
           const md = this.fechaInicioGdaTemp || '08-15';
           const year = new Date(temp.fecha_inicio).getFullYear();
           const inicio = new Date(`${year}-${md}`);
-          const fin = new Date(inicio);
-          fin.setDate(fin.getDate() + 244); // 244 días de la temporada
+          const fin = new Date(`${year + 1}-04-15`);
           const fecha = new Date(d.fecha);
           return fecha >= inicio && fecha <= fin;
         })
@@ -1269,8 +1268,7 @@ export class ZonaViewComponent implements OnInit {
   private generarLabelsDesde(md: string): string[] {
     const labels: string[] = [];
     const start = new Date(`2000-${md}`);
-    const end = new Date(start);
-    end.setDate(end.getDate() + 244);
+    const end = new Date('2001-04-15');
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
       const month = String(d.getMonth() + 1).padStart(2, '0');
       const day = String(d.getDate()).padStart(2, '0');
