@@ -5,23 +5,23 @@ steps:
     dir: 'backend'
     args: [
       'build', 
-      '-t', 'gcr.io/demanda-riego-461720/backend-riego', 
-      '--cache-from', 'gcr.io/demanda-riego-461720/backend-riego',
+      '-t', 'gcr.io/demanda-riego-461720/backend-riego3', 
+      '--cache-from', 'gcr.io/demanda-riego-461720/backend-riego3',
       '.'
     ]
 
   # Push backend
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Push backend'
-    args: ['push', 'gcr.io/demanda-riego-461720/backend-riego']
+    args: ['push', 'gcr.io/demanda-riego-461720/backend-riego3']
 
   # Deploy backend
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'Deploy backend'
     entrypoint: 'gcloud'
     args: [
-      'run', 'deploy', 'backend-riego',
-      '--image', 'gcr.io/demanda-riego-461720/backend-riego',
+      'run', 'deploy', 'backend-riego3',
+      '--image', 'gcr.io/demanda-riego-461720/backend-riego3',
       '--region', 'southamerica-west1',
       '--platform', 'managed',
       '--allow-unauthenticated'
@@ -56,5 +56,5 @@ steps:
     ]
 
 images:
-  - 'gcr.io/demanda-riego-461720/backend-riego'
+  - 'gcr.io/demanda-riego-461720/backend-riego3'
   - 'gcr.io/demanda-riego-461720/frontend-riego'
