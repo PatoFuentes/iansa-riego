@@ -29,7 +29,7 @@ socket.on('error', err => {
   console.error('❌ Falló conexión TCP:', err);
 });
 
-// Configuración de la base de datos
+// Configuración de la base de datoss
 
 // Si la variable DB_HOST no está definida, asumimos "localhost" para
 // evitar fallos de conexión en desarrollo.
