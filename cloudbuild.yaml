@@ -24,9 +24,9 @@ steps:
     entrypoint: 'gcloud'
     args: [
       'run', 'deploy', 'backend-riego',
-      '--image', 'gcr.io/demanda-riego-461720/backend-riego',
-      '--region', 'southamerica-west1',
-      '--platform', 'managed',
+      '--image=gcr.io/demanda-riego-461720/backend-riego',
+      '--region=southamerica-west1',
+      '--platform=managed',
       '--allow-unauthenticated',
       '--service-account=cloudrun-backend-riego-prod@demanda-riego-461720.iam.gserviceaccount.com',
       '--vpc-connector=projects/iansa-prjprd-shd-net-0001/locations/southamerica-west1/connectors/conn-serverless-prod-01',
