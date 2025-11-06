@@ -66,7 +66,7 @@ db.connect((err) => {
   } else {
     console.log("✅ Conectado a la base de datos MySQL");
 
-    const PORT = process.env.PORT || 8080;
+    const PORT = 8080;
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`Servidor corriendo en puerto ${PORT}`);
     });
