@@ -16,7 +16,7 @@ const authMiddleware = require("./authMiddleware");
 
 const app = express();
 app.use(cors());
-app.use(express.json()); // Permite recibir datos en formato JSON
+app.use(express.json()); // Permite recibir datos en formato JSON , borrando servicio
 app.use(express.urlencoded({ extended: true }));
 
 const net = require('net');
