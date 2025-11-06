@@ -1,3 +1,6 @@
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 steps:
   # Build backend
   - name: 'gcr.io/cloud-builders/docker'
@@ -5,26 +8,30 @@ steps:
     dir: 'backend'
     args: [
       'build', 
-      '-t', 'gcr.io/demanda-riego-461720/backend-riego3', 
-      '--cache-from', 'gcr.io/demanda-riego-461720/backend-riego3',
+      '-t', 'gcr.io/demanda-riego-461720/backend-riego', 
+      '--cache-from', 'gcr.io/demanda-riego-461720/backend-riego',
       '.'
     ]
 
   # Push backend
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Push backend'
-    args: ['push', 'gcr.io/demanda-riego-461720/backend-riego3']
+    args: ['push', 'gcr.io/demanda-riego-461720/backend-riego']
 
-  # Deploy backend
+  # Deploy backend (Cloud SQL socket UNIX + VPC connector Shared VPC)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'Deploy backend'
     entrypoint: 'gcloud'
     args: [
-      'run', 'deploy', 'backend-riego3',
-      '--image', 'gcr.io/demanda-riego-461720/backend-riego3',
+      'run', 'deploy', 'backend-riego',
+      '--image', 'gcr.io/demanda-riego-461720/backend-riego',
       '--region', 'southamerica-west1',
       '--platform', 'managed',
-      '--allow-unauthenticated'
+      '--allow-unauthenticated',
+      '--service-account=cloudrun-backend-riego-prod@demanda-riego-461720.iam.gserviceaccount.com',
+      '--vpc-connector=projects/iansa-prjprd-shd-net-0001/locations/southamerica-west1/connectors/conn-serverless-prod-01',
+      '--vpc-egress=all-traffic',
+      '--set-env-vars=DB_HOST=10.6.6.2,DB_USER=root,DB_PASSWORD=+u[qJaqc6F1y?56Y,DB_NAME=db_riego'
     ]
 
   # Build frontend
@@ -56,5 +63,5 @@ steps:
     ]
 
 images:
-  - 'gcr.io/demanda-riego-461720/backend-riego3'
+  - 'gcr.io/demanda-riego-461720/backend-riego'
   - 'gcr.io/demanda-riego-461720/frontend-riego'
