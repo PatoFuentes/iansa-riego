@@ -19,12 +19,30 @@ app.use(cors());
 app.use(express.json()); // Permite recibir datos en formato JSON
 app.use(express.urlencoded({ extended: true }));
 
+const net = require('net');
+const socket = net.createConnection(3306, '10.38.208.2');
+socket.on('connect', () => {
+  console.log('✅ Conexión TCP exitosa a MySQL!');
+  socket.end();
+});
+socket.on('error', err => {
+  console.error('❌ Falló conexión TCP:', err);
+});
+
 // Configuración de la base de datos
 
 // Si la variable DB_HOST no está definida, asumimos "localhost" para
 // evitar fallos de conexión en desarrollo.
 const dbHost = process.env.DB_HOST || "localhost";
-const dbConfig = dbHost.startsWith("/cloudsql")
+const dbConfig = {
+  host: dbHost,
+  port: 3306,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+};
+
+/*const dbConfig = dbHost.startsWith("/cloudsql")
   ? {
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
@@ -38,7 +56,7 @@ const dbConfig = dbHost.startsWith("/cloudsql")
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
     };
-
+*/
 const db = mysql.createConnection(dbConfig);
 
 db.connect((err) => {
