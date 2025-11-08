@@ -59,6 +59,14 @@ const dbConfig = {
 */
 const db = mysql.createConnection(dbConfig);
 
+const fs = require('fs');
+
+console.log('DB_HOST:', dbHost);
+console.log('¿Existe socket?', fs.existsSync(dbHost));
+
+console.log("Iniciando aplicación seba...");
+
+
 db.connect((err) => {
   if (err) {
     console.error("Error de conexión a la base de datos:", err.message);
