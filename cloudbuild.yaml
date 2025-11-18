@@ -56,9 +56,9 @@ steps:
     entrypoint: 'gcloud'
     args: [
       'run', 'deploy', 'frontend-riego',
-      '--image', 'gcr.io/demanda-riego-461720/frontend-riego',
-      '--region', 'southamerica-west1',
-      '--platform', 'managed',
+      '--image=gcr.io/demanda-riego-461720/frontend-riego',
+      '--region=southamerica-west1',
+      '--platform=managed',
       '--allow-unauthenticated'
     ]
 

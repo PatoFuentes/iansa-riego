@@ -66,7 +66,6 @@ console.log('¿Existe socket?', fs.existsSync(dbHost));
 
 console.log("Iniciando aplicación seba...");
 
-
 db.connect((err) => {
   if (err) {
     console.error("Error de conexión a la base de datos:", err.message);
