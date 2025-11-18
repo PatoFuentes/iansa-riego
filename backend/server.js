@@ -64,6 +64,10 @@ db.connect((err) => {
   }
 });
 
+app.get("/", (req, res) => {
+  res.send("✅ Backend Riego funcionando sin DB");
+});
+
 function leerCache(tipo) {
   return new Promise((resolve) => {
     const sql =
