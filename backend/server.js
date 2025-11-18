@@ -19,6 +19,9 @@ app.use(cors());
 app.use(express.json()); // Permite recibir datos en formato JSON , borrando servicio
 app.use(express.urlencoded({ extended: true }));
 
+// ⚠️ Quitar este bloque o usar DB_HOST dinámico (mejor: quitarlo)
+///*
+/*
 const net = require('net');
 const socket = net.createConnection(3306, '10.38.208.2');
 socket.on('connect', () => {
@@ -28,55 +31,36 @@ socket.on('connect', () => {
 socket.on('error', err => {
   console.error('❌ Falló conexión TCP:', err);
 });
+*/
+//*/
 
-// Configuración de la base de datoss
-
-// Si la variable DB_HOST no está definida, asumimos "localhost" para
-// evitar fallos de conexión en desarrollo.
+// --- Config DB ---
 const dbHost = process.env.DB_HOST || "localhost";
 const dbConfig = {
   host: dbHost,
-  port: 3306,
+  port: Number(process.env.DB_PORT || 3306),
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
+  connectTimeout: 10000, // 10s para no colgar arranque
 };
 
-/*const dbConfig = dbHost.startsWith("/cloudsql")
-  ? {
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      socketPath: dbHost,
-    }
-  : {
-      host: dbHost,
-      port: process.env.DB_PORT || 3306,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-    };
-*/
+
+// ✅ 1) Arrancar el HTTP **antes** de la DB
+const PORT = Number(process.env.PORT) || 8080;
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Servidor corriendo en puerto ${PORT}`);
+});
+
+// ✅ 2) Crear conexión (o mejor: pool) SIN bloquear el arranque
 const db = mysql.createConnection(dbConfig);
-
-const fs = require('fs');
-
-console.log('DB_HOST:', dbHost);
-console.log('¿Existe socket?', fs.existsSync(dbHost));
-
-console.log("Iniciando aplicación seba...");
-
 db.connect((err) => {
   if (err) {
     console.error("Error de conexión a la base de datos:", err.message);
-    process.exit(1); // Sale explícitamente si no conecta
+    // No hagas process.exit(1); deja que el servicio siga sirviendo 503/500
+    // y reintente a la DB en cada query.
   } else {
     console.log("✅ Conectado a la base de datos MySQL");
-
-    const PORT = 8080;
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Servidor corriendo en puerto ${PORT}`);
-    });
   }
 });
 
