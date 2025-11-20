@@ -53,9 +53,19 @@ export class RegionViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.regionId = Number(this.route.snapshot.paramMap.get('id')); // ← Guarda en this.regionId
+    console.log('[RegionViewComponent] Región seleccionada', this.regionId);
     if (this.regionId) {
-      this.regionesService.getRegion(this.regionId).subscribe((data) => {
-        this.region = data;
+      this.regionesService.getRegion(this.regionId).subscribe({
+        next: (data) => {
+          console.log('[RegionViewComponent] Detalle de región', data);
+          this.region = data;
+        },
+        error: (error) => {
+          console.error(
+            '[RegionViewComponent] Error al obtener detalle de región',
+            error
+          );
+        },
       });
 
       this.obtenerZonas(this.regionId);
@@ -93,6 +103,7 @@ export class RegionViewComponent implements OnInit {
   obtenerZonas(id: number): void {
     this.zonasService.obtenerZonasPorRegion(id).subscribe({
       next: (data) => {
+        console.log('[RegionViewComponent] Zonas activas recibidas', data);
         this.zonas = data;
       },
       error: (err) => {
@@ -163,6 +174,7 @@ export class RegionViewComponent implements OnInit {
   cargarZonasInactivas(): void {
     this.zonasService.getZonasInactivasPorRegion(this.regionId).subscribe({
       next: (data) => {
+        console.log('[RegionViewComponent] Zonas inactivas recibidas', data);
         this.zonasInactivas = Array.isArray(data) ? data : [];
       },
       error: (err) => {

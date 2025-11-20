@@ -29,13 +29,21 @@ export class RegionIndexComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log('[RegionIndexComponent] Inicializando componente de regiones');
     this.obtenerRegiones();
     this.cargarRegionesInactivas();
   }
 
   obtenerRegiones(): void {
-    this.regionesService.getRegiones().subscribe((data) => {
-      this.regiones = data;
+    console.log('[RegionIndexComponent] Solicitando regiones activas...');
+    this.regionesService.getRegiones().subscribe({
+      next: (data) => {
+        console.log('[RegionIndexComponent] Regiones recibidas', data);
+        this.regiones = data;
+      },
+      error: (error) => {
+        console.error('[RegionIndexComponent] Error al obtener regiones', error);
+      },
     });
   }
 
@@ -47,6 +55,7 @@ export class RegionIndexComponent implements OnInit {
     if (this.nuevaRegion.trim() !== '') {
       this.regionesService.addRegion(this.nuevaRegion).subscribe({
         next: () => {
+          console.log('[RegionIndexComponent] Región agregada con éxito');
           this.toastr.success('Región agregada correctamente ✅');
           this.nuevaRegion = '';
           this.obtenerRegiones();
@@ -59,6 +68,9 @@ export class RegionIndexComponent implements OnInit {
           }
         },
         error: () => {
+          console.error(
+            '[RegionIndexComponent] Error al agregar la región en el servidor'
+          );
           this.toastr.error('Hubo un error al agregar la región ❌');
         },
       });
@@ -68,6 +80,10 @@ export class RegionIndexComponent implements OnInit {
   cargarRegionesInactivas(): void {
     this.regionesService.getRegionesInactivas().subscribe({
       next: (data) => {
+        console.log(
+          '[RegionIndexComponent] Regiones inactivas recibidas',
+          data
+        );
         this.regionesInactivas = Array.isArray(data) ? data : [];
       },
       error: (err) => {
