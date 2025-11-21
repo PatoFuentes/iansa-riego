@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, catchError, tap, throwError } from 'rxjs';
 import { Region } from '../models/region.model';
 import { environment } from '../../../environments/environment';
 
@@ -12,17 +12,20 @@ export class RegionesService {
 
   constructor(private http: HttpClient) {}
 
-  getRegiones(): Observable<any> {
+  getRegiones(): Observable<Region[]> {
     console.log(
       '[RegionesService] Solicitando listado de regiones hacia',
       this.apiUrl
     );
-    return this.http.get<any>(this.apiUrl).pipe(
+    return this.http.get<Region[]>(this.apiUrl).pipe(
       tap({
         next: (response) =>
           console.log('[RegionesService] Respuesta de getRegiones', response),
         error: (error) =>
           console.error('[RegionesService] Error en getRegiones', error),
+      }),
+      catchError((error) => {
+        return throwError(() => error);
       })
     );
   }
@@ -74,6 +77,9 @@ export class RegionesService {
           console.log('[RegionesService] Respuesta de inactivas', response),
         error: (error) =>
           console.error('[RegionesService] Error en getRegionesInactivas', error),
+      }),
+      catchError((error) => {
+        return throwError(() => error);
       })
     );
   }

@@ -1,6 +1,5 @@
 require("dotenv").config();
 const express = require("express");
-const mysql = require("mysql2");
 const cors = require("cors");
 const {
   obtenerDatosETo,
@@ -13,9 +12,28 @@ const SALT_ROUNDS = 10;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const authMiddleware = require("./authMiddleware");
+const { pool, query } = require("./db");
 
 const app = express();
-app.use(cors());
+
+// Configuración de CORS para permitir únicamente el frontend desplegado en Cloud Run
+const allowedOrigins = [
+  process.env.FRONTEND_ORIGIN ||
+    "https://frontend-riego-516546230986.southamerica-west1.run.app",
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("CORS no permitido para este origen"));
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(express.json()); // Permite recibir datos en formato JSON , borrando servicio
 app.use(express.urlencoded({ extended: true }));
 
@@ -34,57 +52,36 @@ socket.on('error', err => {
 */
 //*/
 
-// --- Config DB ---
-const dbHost = process.env.DB_HOST || "localhost";
-const dbConfig = {
-  host: dbHost,
-  port: Number(process.env.DB_PORT || 3306),
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  connectTimeout: 10000, // 10s para no colgar arranque
-};
-
-
 // ✅ 1) Arrancar el HTTP **antes** de la DB
 const PORT = Number(process.env.PORT) || 8080;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
 });
 
-// ✅ 2) Crear conexión (o mejor: pool) SIN bloquear el arranque
-const db = mysql.createConnection(dbConfig);
-db.connect((err) => {
-  if (err) {
-    console.error("Error de conexión a la base de datos:", err.message);
-    // No hagas process.exit(1); deja que el servicio siga sirviendo 503/500
-    // y reintente a la DB en cada query.
-  } else {
-    console.log("✅ Conectado a la base de datos MySQL");
-  }
-});
+// Exponer una interfaz de compatibilidad para el resto del archivo
+const db = { query };
 
 app.get("/", (req, res) => {
   res.send("✅ Backend Riego funcionando sin DB");
 });
 
-function leerCache(tipo) {
-  return new Promise((resolve) => {
-    const sql =
-      "SELECT json_data FROM crawler_cache WHERE fecha = CURDATE() AND tipo = ?";
-    db.query(sql, [tipo], (err, rows) => {
-      if (err || rows.length === 0) return resolve(null);
-      try {
-        const data =
-          typeof rows[0].json_data === "string"
-            ? JSON.parse(rows[0].json_data)
-            : rows[0].json_data;
-        resolve(data);
-      } catch {
-        resolve(null);
-      }
-    });
-  });
+async function leerCache(tipo) {
+  const sql =
+    "SELECT json_data FROM crawler_cache WHERE fecha = CURDATE() AND tipo = ?";
+
+  try {
+    const rows = await db.query(sql, [tipo]);
+
+    if (!rows || rows.length === 0) {
+      return null;
+    }
+
+    const jsonData = rows[0].json_data;
+    return typeof jsonData === "string" ? JSON.parse(jsonData) : jsonData;
+  } catch (error) {
+    console.error("Error al leer cache", error);
+    return null;
+  }
 }
 
 // Middleware para proteger rutas enteras
@@ -93,43 +90,43 @@ app.use("/usuarios", authMiddleware);
 // Regiones
 
 // Obtener todas las regiones activas
-app.get("/regiones", (req, res) => {
-  db.query('SELECT * FROM regiones WHERE estado = "activo"', (err, results) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json(results);
-  });
+app.get("/regiones", async (req, res) => {
+  try {
+    const rows = await db.query(
+      "SELECT * FROM regiones WHERE estado = ?",
+      ["activo"]
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error("Error al obtener regiones:", error);
+    res.status(500).json({ message: "Error al obtener regiones" });
+  }
 });
 
 // Obtener todas las regiones inactivas
-app.get("/regiones/inactivas", (req, res) => {
-  const sql =
-    'SELECT id, nombre, estado FROM regiones WHERE estado = "inactivo"';
-
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error("Error al obtener regiones inactivas:", err);
-      return res
-        .status(500)
-        .json({ error: "Error al obtener regiones inactivas" });
-    }
-
-    res.status(200).json(results);
-  });
+app.get("/regiones/inactivas", async (req, res) => {
+  try {
+    const rows = await db.query(
+      "SELECT id, nombre, estado FROM regiones WHERE estado = ?",
+      ["inactivo"]
+    );
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error("Error al obtener regiones inactivas:", error);
+    res.status(500).json({ message: "Error al obtener regiones" });
+  }
 });
 
 // Obtener una region por ID
-app.get("/regiones/:id", (req, res) => {
+app.get("/regiones/:id", async (req, res) => {
   const { id } = req.params;
-  db.query("SELECT * FROM regiones WHERE id = ?", [id], (err, results) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json(results[0]);
-  });
+  try {
+    const rows = await db.query("SELECT * FROM regiones WHERE id = ?", [id]);
+    res.json(rows[0]);
+  } catch (error) {
+    console.error("Error al obtener región:", error);
+    res.status(500).json({ message: "Error al obtener regiones" });
+  }
 });
 
 // Crear una nueva region
