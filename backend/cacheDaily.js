@@ -2,6 +2,11 @@ const mysql = require('mysql2/promise');
 const puppeteer = require('puppeteer');
 require('dotenv').config();
 
+const launchOptions = {
+  headless: 'new',
+  args: ['--no-sandbox', '--disable-setuid-sandbox'],
+};
+
 // Páginas de origen utilizadas para interceptar los JSON
 const ET_URL =
   process.env.ET_URL ||
@@ -26,7 +31,7 @@ const dbConfig = dbHost.startsWith('/cloudsql')
     };
 
 async function capturarJson(pageUrl, marker) {
-  const browser = await puppeteer.launch({ headless: 'new' });
+  const browser = await puppeteer.launch(launchOptions);
   let data = null;
   try {
     const page = await browser.newPage();
