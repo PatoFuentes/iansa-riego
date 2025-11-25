@@ -13,6 +13,10 @@ const pool = mysql.createPool({
   connectTimeout: 10000,
   enableKeepAlive: true,
   keepAliveInitialDelay: 10000,
+  ssl: {
+    minVersion: 'TLSv1.2',
+    rejectUnauthorized: false, // para probar rápido; más seguro es usar el CA de Cloud SQL
+  },
 });
 
 // Salida temprana para verificar conectividad al iniciar el contenedor
