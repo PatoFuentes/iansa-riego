@@ -65,6 +65,15 @@ app.get("/", (req, res) => {
   res.send("✅ Backend Riego funcionando sin DB");
 });
 
+app.get("/pingdb", async (req, res) => {
+  try {
+    await pool.query("SELECT 1");
+    res.send("DB OK");
+  } catch (err) {
+    res.status(500).send("DB FAIL: " + err.message);
+  }
+});
+
 async function leerCache(tipo) {
   const sql =
     "SELECT json_data FROM crawler_cache WHERE fecha = CURDATE() AND tipo = ?";
