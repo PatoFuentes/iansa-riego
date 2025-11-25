@@ -532,7 +532,7 @@ app.put("/zonas/:id", authMiddleware, (req, res) => {
 // Información desde INIA
 
 // Ejecutar la actualización diaria de caché manualmente
-app.post("/api/cache-daily", async (_req, res) => {
+async function manejarActualizacionCache(_req, res) {
   try {
     await actualizarCache();
     res.json({ message: "Caché actualizada" });
@@ -540,7 +540,10 @@ app.post("/api/cache-daily", async (_req, res) => {
     console.error("❌ Error al actualizar caché:", err);
     res.status(500).json({ error: err.message || "Error al actualizar caché" });
   }
-});
+}
+
+app.post("/api/cache-daily", manejarActualizacionCache);
+app.get("/api/cache-daily", manejarActualizacionCache);
 
 // Endpoint para obtener datos ETo desde estación
 app.get("/api/eto", async (req, res) => {

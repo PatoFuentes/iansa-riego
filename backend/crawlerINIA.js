@@ -1,5 +1,10 @@
 const puppeteer = require("puppeteer");
 
+const launchOptions = {
+  headless: "new",
+  args: ["--no-sandbox", "--disable-setuid-sandbox"],
+};
+
 async function obtenerDatosETo(estacion_id, estacion_api) {
   console.log(
     "➡️ Ejecutando Crawler con ID:",
@@ -8,7 +13,7 @@ async function obtenerDatosETo(estacion_id, estacion_api) {
     estacion_api
   );
 
-  const browser = await puppeteer.launch({ headless: "new" });
+  const browser = await puppeteer.launch(launchOptions);
 
   let jsonEto = null;
   let jsonResumen = null;
@@ -133,7 +138,7 @@ async function obtenerClimaSemanal(estacion_id, estacion_api) {
     estacion_api
   );
 
-  const browser = await puppeteer.launch({ headless: "new" });
+  const browser = await puppeteer.launch(launchOptions);
   const page = await browser.newPage();
   let resumenData = null;
 
