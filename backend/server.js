@@ -37,20 +37,6 @@ app.use(
 app.use(express.json()); // Permite recibir datos en formato JSON , borrando servicio
 app.use(express.urlencoded({ extended: true }));
 
-// ⚠️ Quitar este bloque o usar DB_HOST dinámico (mejor: quitarlo)
-///*
-/*
-const net = require('net');
-const socket = net.createConnection(3306, '10.38.208.2');
-socket.on('connect', () => {
-  console.log('✅ Conexión TCP exitosa a MySQL!');
-  socket.end();
-});
-socket.on('error', err => {
-  console.error('❌ Falló conexión TCP:', err);
-});
-*/
-//*/
 
 // ✅ 1) Arrancar el HTTP **antes** de la DB
 const PORT = Number(process.env.PORT) || 8080;
@@ -64,12 +50,23 @@ const db = { query };
 app.get("/", (req, res) => {
   res.send("✅ Backend Riego funcionando sin DB");
 });
-
+// Endpoint de debug para verificar configuración de la base de datos. BORRAR DESPUÉS
 app.get('/debug-config', (req, res) => {
   res.json({
     DB_HOST: process.env.DB_HOST,
     DB_USER: process.env.DB_USER,
     DB_NAME: process.env.DB_NAME,
+  });
+});
+
+const https = require('https');
+
+app.get('/test-agro', (req, res) => {
+  https.get('https://agrometeorologia.cl/', (r) => {
+    res.status(200).send('OK pude llegar a agrometeorologia (status ' + r.statusCode + ')');
+  }).on('error', (err) => {
+    console.error('Error saliendo a agrometeorologia:', err);
+    res.status(500).send('Error: ' + err.message);
   });
 });
 
