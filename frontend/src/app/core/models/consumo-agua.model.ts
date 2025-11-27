@@ -7,10 +7,11 @@ export interface ConsumoAgua {
   precipitacion: number;
   kc: number;
   etc: number;
+  consumo_goteo: number;
   consumo_pivote: number;
   consumo_cobertura: number;
   consumo_carrete: number;
-  consumo_aspersor: number;
+  consumo_aspersor?: number;
   fecha_generacion: string;
   id_temporada?: number;
 }
