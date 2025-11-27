@@ -5,8 +5,9 @@ export interface EtoConsumoDia {
   fecha: string;
   eto: number;
   kc: number;
+  consumo_goteo: number;
   consumo_pivote: number;
   consumo_cobertura: number;
   consumo_carrete: number;
-  consumo_aspersor: number;
+  consumo_aspersor?: number;
 }

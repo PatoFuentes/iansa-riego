@@ -91,27 +91,27 @@
               <th>Precipitación (mm)</th>
               <th>Kc</th>
               <th>ETc (mm)</th>
+              <th>Goteo (mm)</th>
               <th>Pivote (mm)</th>
               <th>Cobertura (mm)</th>
               <th>Carrete (mm)</th>
-              <th>Aspersión (mm)</th>
               <th *ngIf="esAdmin">Acciones</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let dato of consumoFiltrado">
               <td>
-                {{ dato.semana_inicio | date : "dd-MM-yyyy" }} a
-                {{ dato.semana_fin | date : "dd-MM-yyyy" }}
+                {{ toLocalDate(dato.semana_inicio) | date : "dd-MM-yyyy" }} a
+                {{ toLocalDate(dato.semana_fin) | date : "dd-MM-yyyy" }}
               </td>
               <td>{{ dato.eto | number : "1.0-0" }}</td>
               <td>{{ dato.precipitacion | number : "1.0-0" }}</td>
               <td>{{ dato.kc | number : "1.1-1" }}</td>
               <td>{{ dato.etc | number : "1.0-0" }}</td>
+              <td>{{ dato.consumo_goteo | number : "1.0-0" }}</td>
               <td>{{ dato.consumo_pivote | number : "1.0-0" }}</td>
               <td>{{ dato.consumo_cobertura | number : "1.0-0" }}</td>
               <td>{{ dato.consumo_carrete | number : "1.0-0" }}</td>
-              <td>{{ dato.consumo_aspersor | number : "1.0-0" }}</td>
               <td *ngIf="esAdmin">
                 <button
                   class="btn btn-sm btn-warning me-1"
@@ -367,10 +367,10 @@
             (change)="actualizarGraficoEtoConsumo()"
           >
             <option value="eto">ETo (mm)</option>
+            <option value="consumo_goteo">Goteo (mm)</option>
             <option value="consumo_pivote">Pivote (mm)</option>
             <option value="consumo_cobertura">Cobertura (mm)</option>
             <option value="consumo_carrete">Carrete (mm)</option>
-            <option value="consumo_aspersor">Aspersión (mm)</option>
           </select>
         </div>
         <div class="col-md-6">
@@ -427,10 +427,10 @@
                             <th>Fecha</th>
                             <th>ETo (mm)</th>
                             <th>Kc</th>
+                            <th>Goteo</th>
                             <th>Pivote</th>
                             <th>Cobertura</th>
                             <th>Carrete</th>
-                            <th>Aspersión</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -446,15 +446,13 @@
                                 (ngModelChange)="recalcularConsumosEto(dia)"
                               />
                             </td>
+                            <td>{{ dia.consumo_goteo | number : "1.1-1" }}</td>
                             <td>{{ dia.consumo_pivote | number : "1.1-1" }}</td>
                             <td>
                               {{ dia.consumo_cobertura | number : "1.1-1" }}
                             </td>
                             <td>
                               {{ dia.consumo_carrete | number : "1.1-1" }}
-                            </td>
-                            <td>
-                              {{ dia.consumo_aspersor | number : "1.1-1" }}
                             </td>
                           </tr>
                         </tbody>
@@ -523,10 +521,10 @@
                               <th>Fecha</th>
                               <th>ETo (mm)</th>
                               <th>Kc</th>
+                              <th>Goteo</th>
                               <th>Pivote</th>
                               <th>Cobertura</th>
                               <th>Carrete</th>
-                              <th>Aspersión</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -563,6 +561,9 @@
                                 />
                               </td>
                               <td>
+                                {{ dia.consumo_goteo | number : "1.1-1" }}
+                              </td>
+                              <td>
                                 {{ dia.consumo_pivote | number : "1.1-1" }}
                               </td>
                               <td>
@@ -570,9 +571,6 @@
                               </td>
                               <td>
                                 {{ dia.consumo_carrete | number : "1.1-1" }}
-                              </td>
-                              <td>
-                                {{ dia.consumo_aspersor | number : "1.1-1" }}
                               </td>
                             </tr>
                           </tbody>
@@ -676,10 +674,10 @@
           *ngFor="
             let key of [
               'etc',
+              'consumo_goteo',
               'consumo_pivote',
               'consumo_cobertura',
-              'consumo_carrete',
-              'consumo_aspersor'
+              'consumo_carrete'
             ]
           "
         >
@@ -925,8 +923,8 @@
                   />
                 </td>
                 <td>
-                  {{ c.semana_inicio | date : "dd-MM-yyyy" }} a
-                  {{ c.semana_fin | date : "dd-MM-yyyy" }}
+                  {{ toLocalDate(c.semana_inicio) | date : "dd-MM-yyyy" }} a
+                  {{ toLocalDate(c.semana_fin) | date : "dd-MM-yyyy" }}
                 </td>
                 <td>{{ c.eto }}</td>
               </tr>
@@ -1319,8 +1317,14 @@
           <div class="mb-3">
             <label>Semana</label>
             <div class="form-control" disabled>
-              {{ consumoSeleccionado.semana_inicio | date : "dd-MM-yyyy" }} a
-              {{ consumoSeleccionado.semana_fin | date : "dd-MM-yyyy" }}
+              {{
+                toLocalDate(consumoSeleccionado.semana_inicio)
+                  | date : "dd-MM-yyyy"
+              }}
+              a
+              {{
+                toLocalDate(consumoSeleccionado.semana_fin) | date : "dd-MM-yyyy"
+              }}
             </div>
           </div>
           <div class="mb-3">
