@@ -607,6 +607,7 @@ app.post("/zonas/:zonaId/consumo-agua", (req, res) => {
     precipitacion,
     kc,
     etc,
+    consumo_goteo,
     consumo_pivote,
     consumo_cobertura,
     consumo_carrete,
@@ -614,9 +615,9 @@ app.post("/zonas/:zonaId/consumo-agua", (req, res) => {
     id_temporada,
   } = req.body;
   const sql = `
-        INSERT INTO consumo_agua 
-        (id_zona, semana_inicio, semana_fin, eto, precipitacion, kc, etc, consumo_pivote, consumo_cobertura, consumo_carrete, consumo_aspersor, id_temporada)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO consumo_agua
+        (id_zona, semana_inicio, semana_fin, eto, precipitacion, kc, etc, consumo_goteo, consumo_pivote, consumo_cobertura, consumo_carrete, consumo_aspersor, id_temporada)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
   db.query(
@@ -629,10 +630,11 @@ app.post("/zonas/:zonaId/consumo-agua", (req, res) => {
       redondearEntero(precipitacion),
       kc,
       redondearEntero(etc),
+      redondearEntero(consumo_goteo ?? 0),
       redondearEntero(consumo_pivote),
       redondearEntero(consumo_cobertura),
       redondearEntero(consumo_carrete),
-      redondearEntero(consumo_aspersor),
+      redondearEntero(consumo_aspersor ?? 0),
       id_temporada,
     ],
     (err, result) => {
@@ -661,6 +663,7 @@ app.put("/zonas/:zonaId/consumo-agua/:consumoId", (req, res) => {
     precipitacion,
     kc,
     etc,
+    consumo_goteo,
     consumo_pivote,
     consumo_cobertura,
     consumo_carrete,
@@ -671,7 +674,7 @@ app.put("/zonas/:zonaId/consumo-agua/:consumoId", (req, res) => {
   const sql = `
         UPDATE consumo_agua SET
         semana_inicio = ?, semana_fin = ?, eto = ?, precipitacion = ?, kc = ?, etc = ?,
-        consumo_pivote = ?, consumo_cobertura = ?, consumo_carrete = ?, consumo_aspersor = ?,
+        consumo_goteo = ?, consumo_pivote = ?, consumo_cobertura = ?, consumo_carrete = ?, consumo_aspersor = ?,
         id_temporada = ?
         WHERE id = ?
     `;
@@ -685,10 +688,11 @@ app.put("/zonas/:zonaId/consumo-agua/:consumoId", (req, res) => {
       redondearEntero(precipitacion),
       kc,
       redondearEntero(etc),
+      redondearEntero(consumo_goteo ?? 0),
       redondearEntero(consumo_pivote),
       redondearEntero(consumo_cobertura),
       redondearEntero(consumo_carrete),
-      redondearEntero(consumo_aspersor),
+      redondearEntero(consumo_aspersor ?? 0),
       id_temporada,
       consumoId,
     ],
@@ -752,6 +756,7 @@ app.post("/zonas/:zonaId/eto-consumo-dia", (req, res) => {
     fecha,
     eto,
     kc,
+    consumo_goteo,
     consumo_pivote,
     consumo_cobertura,
     consumo_carrete,
@@ -778,8 +783,8 @@ app.post("/zonas/:zonaId/eto-consumo-dia", (req, res) => {
 
     const insertSql = `
         INSERT INTO eto_consumo_dia
-        (id_zona, id_temporada, fecha, eto, kc, consumo_pivote, consumo_cobertura, consumo_carrete, consumo_aspersor)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (id_zona, id_temporada, fecha, eto, kc, consumo_goteo, consumo_pivote, consumo_cobertura, consumo_carrete, consumo_aspersor)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
     db.query(
@@ -790,10 +795,11 @@ app.post("/zonas/:zonaId/eto-consumo-dia", (req, res) => {
         fecha,
         redondearEntero(eto),
         kc,
+        redondearEntero(consumo_goteo ?? 0),
         redondearEntero(consumo_pivote),
         redondearEntero(consumo_cobertura),
         redondearEntero(consumo_carrete),
-        redondearEntero(consumo_aspersor),
+        redondearEntero(consumo_aspersor ?? 0),
       ],
       (err, result) => {
         if (err) {

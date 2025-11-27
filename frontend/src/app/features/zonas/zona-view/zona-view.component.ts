@@ -125,10 +125,10 @@ export class ZonaViewComponent implements OnInit {
     fecha: string;
     eto: number;
     kc: number;
+    consumo_goteo?: number;
     consumo_pivote?: number;
     consumo_cobertura?: number;
     consumo_carrete?: number;
-    consumo_aspersor?: number;
   }[] = [{ fecha: '', eto: 0, kc: 1 }];
 
   // Eliminación masiva
@@ -190,7 +190,13 @@ export class ZonaViewComponent implements OnInit {
 
     this.aguaService.getConsumoAguaPorZona(this.zona.id).subscribe({
       next: (data) => {
-        this.consumoAgua = data.sort(
+        const normalizados = data.map((d) => ({
+          ...d,
+          consumo_goteo:
+            d.consumo_goteo ??
+            (d.etc ? Number((d.etc / 0.9).toFixed(2)) : 0),
+        }));
+        this.consumoAgua = normalizados.sort(
           (a, b) =>
             new Date(a.semana_inicio).getTime() -
             new Date(b.semana_inicio).getTime()
@@ -299,10 +305,10 @@ export class ZonaViewComponent implements OnInit {
 
     const etc = kc * eto;
     this.recomendacionPreview.etc = etc.toFixed(2);
+    this.recomendacionPreview.consumo_goteo = (etc / 0.9).toFixed(2);
     this.recomendacionPreview.consumo_pivote = (etc / 0.85).toFixed(2);
     this.recomendacionPreview.consumo_cobertura = (etc / 0.8).toFixed(2);
     this.recomendacionPreview.consumo_carrete = (etc / 0.75).toFixed(2);
-    this.recomendacionPreview.consumo_aspersor = (etc / 0.7).toFixed(2);
   }
 
   guardarRecomendacion(): void {
@@ -473,10 +479,10 @@ export class ZonaViewComponent implements OnInit {
       eto: eto.toFixed(2),
       kc: kc.toFixed(2),
       etc: etc.toFixed(2),
+      consumo_goteo: (etc / 0.9).toFixed(2),
       consumo_pivote: (etc / 0.85).toFixed(2),
       consumo_cobertura: (etc / 0.8).toFixed(2),
       consumo_carrete: (etc / 0.75).toFixed(2),
-      consumo_aspersor: (etc / 0.7).toFixed(2),
     };
   }
 
@@ -500,10 +506,10 @@ export class ZonaViewComponent implements OnInit {
       ...this.consumoSeleccionado,
       kc: kcNum.toFixed(1),
       etc: etc.toFixed(1),
+      consumo_goteo: (etc / 0.9).toFixed(1),
       consumo_pivote: (etc / 0.85).toFixed(1),
       consumo_cobertura: (etc / 0.8).toFixed(1),
       consumo_carrete: (etc / 0.75).toFixed(1),
-      consumo_aspersor: (etc / 0.7).toFixed(1),
     };
 
     this.aguaService
@@ -755,10 +761,10 @@ export class ZonaViewComponent implements OnInit {
       'Precipitación (mm)': d.precipitacion,
       Kc: d.kc,
       'ETc (mm)': d.etc,
+      'Goteo (mm)': d.consumo_goteo,
       'Pivote (mm)': d.consumo_pivote,
       'Cobertura (mm)': d.consumo_cobertura,
       'Carrete (mm)': d.consumo_carrete,
-      'Aspersión (mm)': d.consumo_aspersor,
     }));
 
     // Verificar si hay datos
@@ -907,7 +913,13 @@ export class ZonaViewComponent implements OnInit {
 
     this.zonasService.getEtoConsumoDia(this.zona.id).subscribe({
       next: (data) => {
-        this.etoConsumoDia = data.sort(
+        const normalizados = data.map((d) => ({
+          ...d,
+          consumo_goteo:
+            d.consumo_goteo ??
+            (d.eto && d.kc ? Number(((d.eto * d.kc) / 0.9).toFixed(2)) : 0),
+        }));
+        this.etoConsumoDia = normalizados.sort(
           (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
         );
         const ids = Array.from(
@@ -966,7 +978,8 @@ export class ZonaViewComponent implements OnInit {
       let acc = 0;
       labels.forEach((lab) => {
         const encontrado = datosTemp.find((e) => e.dia === lab);
-        if (encontrado) acc += Number(encontrado.valor);
+        const valor = encontrado ? Number(encontrado.valor || 0) : 0;
+        if (!isNaN(valor)) acc += valor;
         data.push(acc);
       });
 
@@ -1024,10 +1037,10 @@ export class ZonaViewComponent implements OnInit {
 
   recalcularConsumosEto(dia: any): void {
     const calc = this.calcularConsumo(+dia.eto, +dia.kc);
+    dia.consumo_goteo = +calc.consumo_goteo;
     dia.consumo_pivote = +calc.consumo_pivote;
     dia.consumo_cobertura = +calc.consumo_cobertura;
     dia.consumo_carrete = +calc.consumo_carrete;
-    dia.consumo_aspersor = +calc.consumo_aspersor;
   }
 
   cargarEtoSemanal(): void {
@@ -1078,10 +1091,10 @@ export class ZonaViewComponent implements OnInit {
         fecha: dia.fecha,
         eto: +dia.eto,
         kc: +dia.kc,
+        consumo_goteo: +dia.consumo_goteo,
         consumo_pivote: +dia.consumo_pivote,
         consumo_cobertura: +dia.consumo_cobertura,
         consumo_carrete: +dia.consumo_carrete,
-        consumo_aspersor: +dia.consumo_aspersor,
       } as EtoConsumoDia;
       return this.zonasService
         .guardarEtoConsumoDia(this.zona.id, datos)
@@ -1122,10 +1135,10 @@ export class ZonaViewComponent implements OnInit {
         fecha: dia.fecha,
         eto: +dia.eto,
         kc: +dia.kc,
+        consumo_goteo: +dia.consumo_goteo!,
         consumo_pivote: +dia.consumo_pivote!,
         consumo_cobertura: +dia.consumo_cobertura!,
         consumo_carrete: +dia.consumo_carrete!,
-        consumo_aspersor: +dia.consumo_aspersor!,
       } as EtoConsumoDia;
       return this.zonasService
         .guardarEtoConsumoDia(this.zona.id, datos)
