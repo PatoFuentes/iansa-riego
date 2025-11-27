@@ -198,8 +198,8 @@ export class ZonaViewComponent implements OnInit {
         }));
         this.consumoAgua = normalizados.sort(
           (a, b) =>
-            new Date(a.semana_inicio).getTime() -
-            new Date(b.semana_inicio).getTime()
+            (this.toLocalDate(a.semana_inicio)?.getTime() || 0) -
+            (this.toLocalDate(b.semana_inicio)?.getTime() || 0)
         );
       },
       error: (err) => {
@@ -755,8 +755,10 @@ export class ZonaViewComponent implements OnInit {
   }
   exportarConsumoAgua(): void {
     const datos = this.consumoFiltrado.map((d) => ({
-      'Semana Inicio': new Date(d.semana_inicio).toLocaleDateString('es-CL'),
-      'Semana Fin': new Date(d.semana_fin).toLocaleDateString('es-CL'),
+      'Semana Inicio':
+        this.toLocalDate(d.semana_inicio)?.toLocaleDateString('es-CL') || '',
+      'Semana Fin':
+        this.toLocalDate(d.semana_fin)?.toLocaleDateString('es-CL') || '',
       'ETo (mm)': d.eto,
       'Precipitación (mm)': d.precipitacion,
       Kc: d.kc,
@@ -1325,6 +1327,12 @@ export class ZonaViewComponent implements OnInit {
     return this.consumoAgua.filter(
       (c) => c.semana_inicio.includes(term) || c.semana_fin.includes(term)
     );
+  }
+
+  toLocalDate(fecha: string | Date | null | undefined): Date | null {
+    if (!fecha) return null;
+    if (fecha instanceof Date) return fecha;
+    return new Date(`${fecha}T00:00:00`);
   }
 
   get climaBusqueda(): ClimaZona[] {
