@@ -193,13 +193,12 @@ export class ZonaViewComponent implements OnInit {
         const normalizados = data.map((d) => ({
           ...d,
           consumo_goteo:
-            d.consumo_goteo ??
-            (d.etc ? Number((d.etc / 0.9).toFixed(2)) : 0),
+            d.consumo_goteo ?? (d.etc ? Number((d.etc / 0.9).toFixed(2)) : 0),
         }));
         this.consumoAgua = normalizados.sort(
           (a, b) =>
-            (this.toLocalDate(a.semana_inicio)?.getTime() || 0) -
-            (this.toLocalDate(b.semana_inicio)?.getTime() || 0)
+            new Date(a.semana_inicio)?.getTime() -
+            new Date(b.semana_inicio)?.getTime()
         );
       },
       error: (err) => {
@@ -664,9 +663,9 @@ export class ZonaViewComponent implements OnInit {
               pointHoverRadius: 8,
               pointBackgroundColor: 'red',
               fill: false,
-            type: 'line',
-          },
-        ],
+              type: 'line',
+            },
+          ],
         };
         this.actualizarGraficoGradosDia();
         this.actualizarGraficoGdaTemporadas();
@@ -755,10 +754,8 @@ export class ZonaViewComponent implements OnInit {
   }
   exportarConsumoAgua(): void {
     const datos = this.consumoFiltrado.map((d) => ({
-      'Semana Inicio':
-        this.toLocalDate(d.semana_inicio)?.toLocaleDateString('es-CL') || '',
-      'Semana Fin':
-        this.toLocalDate(d.semana_fin)?.toLocaleDateString('es-CL') || '',
+      'Semana Inicio': new Date(d.semana_inicio).toLocaleDateString('es-CL'),
+      'Semana Fin': new Date(d.semana_fin).toLocaleDateString('es-CL'),
       'ETo (mm)': d.eto,
       'Precipitación (mm)': d.precipitacion,
       Kc: d.kc,
@@ -1020,13 +1017,13 @@ export class ZonaViewComponent implements OnInit {
           labels: { usePointStyle: true },
         },
         tooltip: {
-              callbacks: {
-                label: (context: any) => {
-                  const valor = context.parsed.y;
-                  return `${Math.round(valor)} mm acumulados`;
-                },
-              },
+          callbacks: {
+            label: (context: any) => {
+              const valor = context.parsed.y;
+              return `${Math.round(valor)} mm acumulados`;
             },
+          },
+        },
       },
       scales: {
         y: { title: { display: true, text: 'mm acumulados' } },
@@ -1179,9 +1176,7 @@ export class ZonaViewComponent implements OnInit {
       return;
     }
 
-    const labels = this.generarLabelsDesde(
-      this.fechaInicioGdaTemp || '08-15'
-    );
+    const labels = this.generarLabelsDesde(this.fechaInicioGdaTemp || '08-15');
 
     const colores = [
       '#3e95cd',
@@ -1275,8 +1270,7 @@ export class ZonaViewComponent implements OnInit {
   }
 
   seleccionarFechaGda(fecha: string): void {
-    this.fechaInicioGdaTemp =
-      this.fechaInicioGdaTemp === fecha ? null : fecha;
+    this.fechaInicioGdaTemp = this.fechaInicioGdaTemp === fecha ? null : fecha;
     this.actualizarGraficoGdaTemporadas();
   }
 
@@ -1327,12 +1321,6 @@ export class ZonaViewComponent implements OnInit {
     return this.consumoAgua.filter(
       (c) => c.semana_inicio.includes(term) || c.semana_fin.includes(term)
     );
-  }
-
-  toLocalDate(fecha: string | Date | null | undefined): Date | null {
-    if (!fecha) return null;
-    if (fecha instanceof Date) return fecha;
-    return new Date(`${fecha}T00:00:00`);
   }
 
   get climaBusqueda(): ClimaZona[] {

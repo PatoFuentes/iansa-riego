@@ -101,8 +101,8 @@
           <tbody>
             <tr *ngFor="let dato of consumoFiltrado">
               <td>
-                {{ toLocalDate(dato.semana_inicio) | date : "dd-MM-yyyy" }} a
-                {{ toLocalDate(dato.semana_fin) | date : "dd-MM-yyyy" }}
+                {{ dato.semana_inicio | date : "dd-MM-yyyy" }} a
+                {{ dato.semana_fin | date : "dd-MM-yyyy" }}
               </td>
               <td>{{ dato.eto | number : "1.0-0" }}</td>
               <td>{{ dato.precipitacion | number : "1.0-0" }}</td>
@@ -232,7 +232,10 @@
             (change)="actualizarGraficoGradosDia()"
           />
         </div>
-        <button class="btn btn-outline-success align-self-end" (click)="descargarGrafico()">
+        <button
+          class="btn btn-outline-success align-self-end"
+          (click)="descargarGrafico()"
+        >
           Descargar Gráfico
         </button>
       </div>
@@ -282,7 +285,9 @@
                 (change)="seleccionarFechaGda('09-15')"
                 [checked]="fechaInicioGdaTemp === '09-15'"
               />
-              <label class="form-check-label" for="fechaSep">15 septiembre</label>
+              <label class="form-check-label" for="fechaSep"
+                >15 septiembre</label
+              >
             </div>
           </div>
         </div>
@@ -923,8 +928,8 @@
                   />
                 </td>
                 <td>
-                  {{ toLocalDate(c.semana_inicio) | date : "dd-MM-yyyy" }} a
-                  {{ toLocalDate(c.semana_fin) | date : "dd-MM-yyyy" }}
+                  {{ c.semana_inicio | date : "dd-MM-yyyy" }} a
+                  {{ c.semana_fin | date : "dd-MM-yyyy" }}
                 </td>
                 <td>{{ c.eto }}</td>
               </tr>
@@ -1316,15 +1321,9 @@
         <form>
           <div class="mb-3">
             <label>Semana</label>
-            <div class="form-control" disabled>
-              {{
-                toLocalDate(consumoSeleccionado.semana_inicio)
-                  | date : "dd-MM-yyyy"
-              }}
-              a
-              {{
-                toLocalDate(consumoSeleccionado.semana_fin) | date : "dd-MM-yyyy"
-              }}
+            <div class="form-control">
+              {{ consumoSeleccionado.semana_inicio | date : "dd-MM-yyyy" }} a
+              {{ consumoSeleccionado.semana_fin | date : "dd-MM-yyyy" }}
             </div>
           </div>
           <div class="mb-3">
