@@ -31,7 +31,7 @@ steps:
       '--service-account=cloudrun-backend-riego-prod@demanda-riego-461720.iam.gserviceaccount.com',
       '--vpc-connector=projects/iansa-prjprd-shd-net-0001/locations/southamerica-west1/connectors/conn-serverless-prod-01',
       '--vpc-egress=all-traffic',
-      '--set-env-vars=DB_HOST=10.6.6.2,DB_USER=root,DB_PASSWORD=+u[qJaqc6F1y?56Y,DB_NAME=db_riego'
+      '--set-env-vars=DB_HOST=10.6.6.2,DB_USER=root,DB_PASSWORD=+u[qJaqc6F1y?56Y,DB_NAME=db_riego,JWT_SECRET=WaldoBoss123,FRONTEND_ORIGIN=https://frontend-riego-h3l6qrwcra-tl.a.run.app'
     ]
 
   # Build frontend
