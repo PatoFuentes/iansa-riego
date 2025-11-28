@@ -30,6 +30,7 @@ const TEMPORADA_COLORS: Record<string, string> = {
   '2022-2023': '#1abc9c',
   '2023-2024': '#3498db',
   '2024-2025': '#8e44ad',
+  '2025-2026': '#e67e22',
 };
 
 @Component({
