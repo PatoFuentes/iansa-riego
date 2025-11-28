@@ -101,8 +101,8 @@
           <tbody>
             <tr *ngFor="let dato of consumoFiltrado">
               <td>
-                {{ dato.semana_inicio | date : "dd-MM-yyyy" }} a
-                {{ dato.semana_fin | date : "dd-MM-yyyy" }}
+                {{ dato.semana_inicio | date : "dd-MM-yyyy":'UTC' }} a
+                {{ dato.semana_fin | date : "dd-MM-yyyy":'UTC' }}
               </td>
               <td>{{ dato.eto | number : "1.0-0" }}</td>
               <td>{{ dato.precipitacion | number : "1.0-0" }}</td>
@@ -928,8 +928,8 @@
                   />
                 </td>
                 <td>
-                  {{ c.semana_inicio | date : "dd-MM-yyyy" }} a
-                  {{ c.semana_fin | date : "dd-MM-yyyy" }}
+                  {{ c.semana_inicio | date : "dd-MM-yyyy":'UTC' }} a
+                  {{ c.semana_fin | date : "dd-MM-yyyy":'UTC' }}
                 </td>
                 <td>{{ c.eto }}</td>
               </tr>
@@ -1322,8 +1322,8 @@
           <div class="mb-3">
             <label>Semana</label>
             <div class="form-control">
-              {{ consumoSeleccionado.semana_inicio | date : "dd-MM-yyyy" }} a
-              {{ consumoSeleccionado.semana_fin | date : "dd-MM-yyyy" }}
+              {{ consumoSeleccionado.semana_inicio | date : "dd-MM-yyyy":'UTC' }} a
+              {{ consumoSeleccionado.semana_fin | date : "dd-MM-yyyy":'UTC' }}
             </div>
           </div>
           <div class="mb-3">
