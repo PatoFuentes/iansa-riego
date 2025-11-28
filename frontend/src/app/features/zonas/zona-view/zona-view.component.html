@@ -195,7 +195,7 @@
           </thead>
           <tbody>
             <tr *ngFor="let dia of climaFiltrado">
-              <td>{{ dia.fecha | date : "dd-MM-yyyy" }}</td>
+              <td>{{ dia.fecha | date : "dd-MM-yyyy":'UTC' }}</td>
               <td>{{ dia.ta_min | number : "1.0-0" }}</td>
               <td>{{ dia.ta_max | number : "1.0-0" }}</td>
               <td>{{ dia.ta_prom | number : "1.0-0" }}</td>
@@ -440,7 +440,7 @@
                         </thead>
                         <tbody>
                           <tr *ngFor="let dia of etoSemanalPreview">
-                            <td>{{ dia.fecha | date : "dd-MM-yyyy" }}</td>
+                            <td>{{ dia.fecha | date : "dd-MM-yyyy":'UTC' }}</td>
                             <td>{{ dia.eto | number : "1.1-1" }}</td>
                             <td>
                               <input
@@ -797,7 +797,7 @@
                     (change)="onCheckChange(e.id_eto_dia!, $event, 'eto')"
                   />
                 </td>
-                <td>{{ e.fecha | date : "dd-MM-yyyy" }}</td>
+                <td>{{ e.fecha | date : "dd-MM-yyyy":'UTC' }}</td>
                 <td>{{ e.eto }}</td>
               </tr>
             </tbody>
@@ -862,7 +862,7 @@
                     (change)="onCheckChange(d.id!, $event, 'clima')"
                   />
                 </td>
-                <td>{{ d.fecha | date : "dd-MM-yyyy" }}</td>
+                <td>{{ d.fecha | date : "dd-MM-yyyy":'UTC' }}</td>
                 <td>{{ d.ta_min }}</td>
                 <td>{{ d.ta_max }}</td>
               </tr>
@@ -1105,7 +1105,7 @@
             </thead>
             <tbody>
               <tr *ngFor="let dia of climaSemanalPreview">
-                <td>{{ dia.fecha | date : "dd-MM-yyyy" }}</td>
+                <td>{{ dia.fecha | date : "dd-MM-yyyy":'UTC' }}</td>
                 <td>
                   <input
                     type="number"
