@@ -572,6 +572,10 @@ export class ZonaViewComponent implements OnInit {
     return Math.max(0, temp_prom - 3);
   }
 
+  private formatDateToCL(date: string | number | Date): string {
+    return new Date(date).toLocaleDateString('es-CL', { timeZone: 'UTC' });
+  }
+
   public chartLabels: string[] = [];
   public ultimoGradoDia: number = 0;
   public chartOptions: any;
@@ -755,8 +759,8 @@ export class ZonaViewComponent implements OnInit {
   }
   exportarConsumoAgua(): void {
     const datos = this.consumoFiltrado.map((d) => ({
-      'Semana Inicio': new Date(d.semana_inicio).toLocaleDateString('es-CL'),
-      'Semana Fin': new Date(d.semana_fin).toLocaleDateString('es-CL'),
+      'Semana Inicio': this.formatDateToCL(d.semana_inicio),
+      'Semana Fin': this.formatDateToCL(d.semana_fin),
       'ETo (mm)': d.eto,
       'Precipitación (mm)': d.precipitacion,
       Kc: d.kc,
@@ -815,7 +819,7 @@ export class ZonaViewComponent implements OnInit {
 
   exportarClima(): void {
     const datos = this.climaFiltrado.map((d) => ({
-      Fecha: new Date(d.fecha).toLocaleDateString('es-CL'),
+      Fecha: this.formatDateToCL(d.fecha),
       'Temperatura Mínima (°C)': d.ta_min,
       'Temperatura Máxima (°C)': d.ta_max,
       'Temperatura Promedio (°C)': d.ta_prom,
