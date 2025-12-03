@@ -1294,7 +1294,9 @@ export class ZonaViewComponent implements OnInit {
   private generarLabelsPeriodo(): string[] {
     const labels: string[] = [];
     const start = new Date('2000-09-01');
-    const end = new Date('2001-03-23');
+    // Se cubre toda la temporada agrícola (sep a ago) para incluir datos
+    // tardíos de temporadas más recientes (ej. 2025-2026).
+    const end = new Date('2001-08-31');
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
       const month = String(d.getMonth() + 1).padStart(2, '0');
       const day = String(d.getDate()).padStart(2, '0');
