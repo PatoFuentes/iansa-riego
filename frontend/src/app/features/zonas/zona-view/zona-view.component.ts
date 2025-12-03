@@ -165,7 +165,7 @@ export class ZonaViewComponent implements OnInit {
           this.obtenerConsumoAgua();
           this.obtenerClima();
           this.obtenerEtoConsumoDia();
-          this.temporadasService.getTemporadasActivas().subscribe({
+          this.temporadasService.getTemporadas().subscribe({
             next: (data) => {
               this.temporadas = data.sort((a, b) =>
                 a.nombre.localeCompare(b.nombre)
